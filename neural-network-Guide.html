@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neural Network — Deep Learning Visual Guide</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Outfit:wght@300;500;700;900&display=swap');
+:root {
+  --bg:#060610; --panel:#0c0c1a; --border:#1a1a35;
+  --accent:#4f6ef7; --green:#00d68f; --yellow:#ffc947;
+  --red:#ff3d6b; --purple:#b47bff; --teal:#00c8d4;
+  --text:#c0c0e0; --dim:#44446a;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;}
+.header{text-align:center;padding:16px 16px 8px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,#0a0a1f,var(--bg));}
+.header h1{font-size:clamp(15px,4vw,22px);font-weight:900;background:linear-gradient(90deg,var(--accent),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.header p{font-size:10px;color:var(--dim);font-family:'Fira Code',monospace;margin-top:3px;}
+.tabs{display:flex;overflow-x:auto;gap:5px;padding:8px 10px;border-bottom:1px solid var(--border);scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{flex-shrink:0;background:var(--panel);border:1px solid var(--border);color:var(--dim);padding:5px 11px;border-radius:20px;font-size:10px;font-family:'Fira Code',monospace;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.tab:hover{border-color:var(--accent);color:var(--text);}
+.tab.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600;}
+.content{max-width:760px;margin:0 auto;padding:0 10px 60px;}
+.section{display:none;animation:fadeUp 0.35s ease;}
+.section.show{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.sec-header{padding:12px 0 8px;display:flex;align-items:center;gap:10px;}
+.sec-num{width:28px;height:28px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#fff;flex-shrink:0;}
+.sec-title{font-size:16px;font-weight:700;color:#fff;}
+.why-box{font-family:'Fira Code',monospace;font-size:11px;color:var(--yellow);background:#100e00;border:1px solid #2a2200;border-radius:7px;padding:8px 12px;margin-bottom:10px;}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;}
+.card-title{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--dim);font-family:'Fira Code',monospace;margin-bottom:8px;}
+.card p{font-size:13px;line-height:1.7;margin-bottom:6px;}
+.code{background:#030306;border-radius:7px;padding:10px 12px;font-family:'Fira Code',monospace;font-size:11px;line-height:2.1;border-left:3px solid var(--accent);margin:6px 0;white-space:pre-wrap;word-break:break-word;}
+.g{color:var(--green)}.y{color:var(--yellow)}.r{color:var(--red)}.b{color:var(--teal)}.p{color:var(--purple)}.w{color:#fff;font-weight:600}.d{color:var(--dim)}.loc{color:#00d68f;font-weight:600}.sqft{color:#00c8d4;font-weight:600}
+.step-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.sbtn{background:var(--panel);border:1px solid var(--border);color:var(--dim);padding:6px 12px;border-radius:7px;font-size:10px;font-family:'Fira Code',monospace;cursor:pointer;transition:all 0.2s;}
+.sbtn:hover{border-color:var(--accent);color:var(--text);}
+.sbtn.on{background:#101640;border-color:var(--accent);color:var(--accent);}
+.svgwrap{background:#020206;border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden;}
+.cpanel{display:none;}.cpanel.show{display:block;animation:fadeUp 0.3s ease;}
+.analogy{background:#060f06;border:1px solid #0f1f0f;border-radius:8px;padding:10px 14px;margin:8px 0;font-size:12px;line-height:1.9;}
+.atitle{color:var(--green);font-size:10px;font-family:'Fira Code',monospace;margin-bottom:5px;letter-spacing:1px;}
+.lbar-wrap{margin:6px 0;}.lbar-label{font-size:10px;font-family:'Fira Code',monospace;color:var(--dim);margin-bottom:3px;}
+.lbar-bg{background:#06060f;border-radius:5px;height:20px;border:1px solid var(--border);overflow:hidden;}
+.lbar{height:100%;border-radius:5px;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;font-size:10px;font-family:'Fira Code',monospace;color:#fff;font-weight:600;}
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:10px;font-family:'Fira Code',monospace;}
+.leg-dot{width:12px;height:3px;border-radius:2px;}
+.dots{display:flex;justify-content:center;gap:6px;padding:12px 0 8px;}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--border);cursor:pointer;transition:all 0.3s;}
+.dot.on{background:var(--accent);transform:scale(1.3);}
+
+/* WEIGHT CHANGE TABLE */
+.wtable{width:100%;border-collapse:collapse;font-family:'Fira Code',monospace;font-size:11px;margin-top:8px;}
+.wtable th{background:#0a0a18;color:var(--dim);padding:6px 8px;text-align:left;border-bottom:1px solid var(--border);font-size:10px;}
+.wtable td{padding:7px 8px;border-bottom:1px solid #0d0d20;vertical-align:middle;}
+.wtable tr:last-child td{border-bottom:none;}
+.old-w{color:var(--red);font-weight:600;}
+.new-w{color:var(--green);font-weight:600;}
+.arrow-cell{color:var(--dim);}
+
+/* ROUND TRACKER */
+.round-box{background:#08080f;border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:10px;}
+.round-title{font-family:'Fira Code',monospace;font-size:10px;color:var(--dim);margin-bottom:8px;letter-spacing:1px;}
+.round-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-family:'Fira Code',monospace;font-size:11px;}
+.round-num{background:#1a1a35;border-radius:4px;padding:2px 6px;color:var(--accent);font-size:10px;flex-shrink:0;}
+.round-bar-bg{flex:1;background:#0a0a14;border-radius:4px;height:14px;overflow:hidden;}
+.round-bar{height:100%;border-radius:4px;transition:width 1s ease;display:flex;align-items:center;padding-left:6px;font-size:9px;color:#fff;font-weight:600;}
+.round-loss{color:var(--yellow);font-size:10px;flex-shrink:0;min-width:60px;text-align:right;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🧠 Neural Network — Deep Learning Visual Guide</h1>
+  <p>Input: Location=7 | Sqft=1000 | Target: $200k &nbsp;|&nbsp; Architecture: 2 → 3 → 2 → 3 → 1</p>
+</div>
+
+<div class="tabs" id="tabRow">
+  <button class="tab active" onclick="goSec(0)">① Weight&Bias</button>
+  <button class="tab" onclick="goSec(1)">② Forward Pass</button>
+  <button class="tab" onclick="goSec(2)">③ Loss</button>
+  <button class="tab" onclick="goSec(3)">④ Backprop</button>
+  <button class="tab" onclick="goSec(4)">⑤ Grad Descent</button>
+  <button class="tab" onclick="goSec(5)">⑥ Vanishing</button>
+  <button class="tab" onclick="goSec(6)">⑦ ReLU</button>
+  <button class="tab" onclick="goSec(7)">⑧ Softmax</button>
+  <button class="tab" onclick="goSec(8)">⑨ Batch Norm</button>
+  <button class="tab" onclick="goSec(9)">⑩ Residual</button>
+</div>
+
+<div class="content">
+
+<!-- ① WEIGHT & BIAS -->
+<div class="section show" id="s0">
+  <div class="sec-header"><div class="sec-num">1</div><div class="sec-title">Weight & Bias</div></div>
+  <div class="why-box">💡 WHY: Weights and biases are the only learnable parameters. Everything else in the network is fixed math. Training = finding the right values for these.</div>
+  <div class="analogy">
+    <div class="atitle">🚕 UBER FARE — EXACT SAME FORMULA</div>
+    Total Fare = (<span class="y">Price per km</span> × Distance) + <span class="b">Base Fare</span><br><br>
+    <span class="y">Price per km</span> = <span class="w">WEIGHT</span> — sensitivity of output to input<br>
+    <span class="b">Base Fare</span> = <span class="w">BIAS</span> — fixed offset regardless of input<br>
+    Distance = <span class="w">INPUT</span> — data fed into the network
+  </div>
+  <div class="card">
+    <div class="card-title">Same Formula — House Price</div>
+    <div class="code">Price = (<span class="loc">W_loc</span> × Location) + (<span class="sqft">W_sqft</span> × Sqft) + Bias
+      = (<span class="loc">0.5</span>   × <span class="y">7</span>)        + (<span class="sqft">0.3</span>    × <span class="y">1000</span>) + <span class="b">10</span>
+      = 3.5 + 300 + 10
+      = <span class="w">313.5</span>
+
+<span class="d">Each input has its OWN weight.
+Bias is ONE value added at the end.
+Both start RANDOM and are fixed through training.</span></div>
+  </div>
+</div>
+
+<!-- ② FORWARD PASS -->
+<div class="section" id="s1">
+  <div class="sec-header"><div class="sec-num">2</div><div class="sec-title">Forward Pass — All Weights Visible</div></div>
+  <div class="why-box">💡 WHY: Data flows forward layer by layer. Every connection carries a weight. Every neuron adds a bias. Both LOC and SQFT connect to ALL neurons.</div>
+  <div class="legend">
+    <div class="leg-item"><div class="leg-dot" style="background:#00d68f"></div><span style="color:#00d68f">LOC weights</span></div>
+    <div class="leg-item"><div class="leg-dot" style="background:#00c8d4"></div><span style="color:#00c8d4">SQFT weights</span></div>
+    <div class="leg-item"><div class="leg-dot" style="background:#ffc947"></div><span style="color:#ffc947">Output values</span></div>
+    <div class="leg-item"><div class="leg-dot" style="background:#b47bff"></div><span style="color:#b47bff">Bias</span></div>
+  </div>
+  <div class="step-row">
+    <button class="sbtn on" onclick="fwd(0)">Start</button>
+    <button class="sbtn" onclick="fwd(1)">→ Layer 1</button>
+    <button class="sbtn" onclick="fwd(2)">→ Layer 2</button>
+    <button class="sbtn" onclick="fwd(3)">→ Layer 3</button>
+    <button class="sbtn" onclick="fwd(4)">→ Output</button>
+  </div>
+  <div class="svgwrap"><svg id="fsvg" viewBox="0 0 820 440" width="100%" xmlns="http://www.w3.org/2000/svg">
+    <text x="60"  y="18" font-family="Fira Code" font-size="9" fill="#222244" text-anchor="middle">INPUT</text>
+    <text x="230" y="18" font-family="Fira Code" font-size="9" fill="#222244" text-anchor="middle">LAYER 1</text>
+    <text x="420" y="18" font-family="Fira Code" font-size="9" fill="#222244" text-anchor="middle">LAYER 2</text>
+    <text x="600" y="18" font-family="Fira Code" font-size="9" fill="#222244" text-anchor="middle">LAYER 3</text>
+    <text x="760" y="18" font-family="Fira Code" font-size="9" fill="#222244" text-anchor="middle">OUTPUT</text>
+    <line x1="140" y1="25" x2="140" y2="420" stroke="#0c0c20" stroke-width="1"/>
+    <line x1="320" y1="25" x2="320" y2="420" stroke="#0c0c20" stroke-width="1"/>
+    <line x1="510" y1="25" x2="510" y2="420" stroke="#0c0c20" stroke-width="1"/>
+    <line x1="690" y1="25" x2="690" y2="420" stroke="#0c0c20" stroke-width="1"/>
+    <!-- LOC → L1 -->
+    <line id="e-loc-n1" x1="88" y1="122" x2="202" y2="92"  stroke="#1a1a35" stroke-width="1.3"/>
+    <line id="e-loc-n2" x1="88" y1="130" x2="202" y2="220" stroke="#1a1a35" stroke-width="1.3"/>
+    <line id="e-loc-n3" x1="88" y1="138" x2="202" y2="348" stroke="#1a1a35" stroke-width="1.3"/>
+    <!-- SQFT → L1 -->
+    <line id="e-sqft-n1" x1="88" y1="302" x2="202" y2="98"  stroke="#1a1a35" stroke-width="1.3"/>
+    <line id="e-sqft-n2" x1="88" y1="310" x2="202" y2="228" stroke="#1a1a35" stroke-width="1.3"/>
+    <line id="e-sqft-n3" x1="88" y1="318" x2="202" y2="358" stroke="#1a1a35" stroke-width="1.3"/>
+    <!-- LOC weight labels -->
+    <text id="wl-loc-n1" x="132" y="93"  font-family="Fira Code" font-size="8.5" fill="#00d68f" text-anchor="middle" opacity="0" font-weight="600">w=0.5</text>
+    <text id="wl-loc-n2" x="122" y="168" font-family="Fira Code" font-size="8.5" fill="#00d68f" text-anchor="middle" opacity="0" font-weight="600">w=0.8</text>
+    <text id="wl-loc-n3" x="118" y="255" font-family="Fira Code" font-size="8.5" fill="#00d68f" text-anchor="middle" opacity="0" font-weight="600">w=0.2</text>
+    <!-- SQFT weight labels -->
+    <text id="wl-sqft-n1" x="142" y="178" font-family="Fira Code" font-size="8.5" fill="#00c8d4" text-anchor="middle" opacity="0" font-weight="600">w=0.3</text>
+    <text id="wl-sqft-n2" x="148" y="272" font-family="Fira Code" font-size="8.5" fill="#00c8d4" text-anchor="middle" opacity="0" font-weight="600">w=0.1</text>
+    <text id="wl-sqft-n3" x="145" y="345" font-family="Fira Code" font-size="8.5" fill="#00c8d4" text-anchor="middle" opacity="0" font-weight="600">w=0.6</text>
+    <!-- L1→L2 -->
+    <line id="e-n1-m1" x1="258" y1="83"  x2="392" y2="168" stroke="#1a1a35" stroke-width="1.3"/>
+    <line id="e-n1-m2" x1="258" y1="90"  x2="392" y2="282" stroke="#1a1a35" stroke-width="1.3"/>
+    <line id="e-n2-m1" x1="258" y1="216" x2="392" y2="172" stroke="#1a1a35" stroke-width="1.3"/>
+    <line id="e-n2-m2" x1="258" y1="224" x2="392" y2="278" stroke="#1a1a35" stroke-width="1.3"/>
+    <line id="e-n3-m1" x1="258" y1="344" x2="392" y2="176" stroke="#1a1a35" stroke-width="1.3"/>
+    <line id="e-n3-m2" x1="258" y1="356" x2="392" y2="286" stroke="#1a1a35" stroke-width="1.3"/>
+    <text id="wl-n1-m1" x="318" y="115" font-family="Fira Code" font-size="8" fill="#ffc947" text-anchor="middle" opacity="0">w=0.4</text>
+    <text id="wl-n1-m2" x="318" y="195" font-family="Fira Code" font-size="8" fill="#ffc947" text-anchor="middle" opacity="0">w=0.2</text>
+    <text id="wl-n2-m1" x="322" y="188" font-family="Fira Code" font-size="8" fill="#ffc947" text-anchor="middle" opacity="0">w=0.3</text>
+    <text id="wl-n2-m2" x="322" y="255" font-family="Fira Code" font-size="8" fill="#ffc947" text-anchor="middle" opacity="0">w=0.5</text>
+    <text id="wl-n3-m1" x="318" y="268" font-family="Fira Code" font-size="8" fill="#ffc947" text-anchor="middle" opacity="0">w=0.2</text>
+    <text id="wl-n3-m2" x="318" y="332" font-family="Fira Code" font-size="8" fill="#ffc947" text-anchor="middle" opacity="0">w=0.1</text>
+    <!-- L2→L3 -->
+    <line id="e-m1-p1" x1="448" y1="165" x2="572" y2="90"  stroke="#1a1a35" stroke-width="1.3"/>
+    <line id="e-m1-p2" x1="448" y1="172" x2="572" y2="220" stroke="#1a1a35" stroke-width="1.3"/>
+    <line id="e-m1-p3" x1="448" y1="178" x2="572" y2="350" stroke="#1a1a35" stroke-width="1.3"/>
+    <line id="e-m2-p1" x1="448" y1="278" x2="572" y2="96"  stroke="#1a1a35" stroke-width="1.3"/>
+    <line id="e-m2-p2" x1="448" y1="284" x2="572" y2="226" stroke="#1a1a35" stroke-width="1.3"/>
+    <line id="e-m2-p3" x1="448" y1="290" x2="572" y2="356" stroke="#1a1a35" stroke-width="1.3"/>
+    <text id="wl-m1-p1" x="506" y="112" font-family="Fira Code" font-size="8" fill="#b47bff" text-anchor="middle" opacity="0">w=0.3</text>
+    <text id="wl-m1-p2" x="510" y="193" font-family="Fira Code" font-size="8" fill="#b47bff" text-anchor="middle" opacity="0">w=0.5</text>
+    <text id="wl-m1-p3" x="506" y="275" font-family="Fira Code" font-size="8" fill="#b47bff" text-anchor="middle" opacity="0">w=0.1</text>
+    <text id="wl-m2-p1" x="516" y="155" font-family="Fira Code" font-size="8" fill="#b47bff" text-anchor="middle" opacity="0">w=0.4</text>
+    <text id="wl-m2-p2" x="520" y="255" font-family="Fira Code" font-size="8" fill="#b47bff" text-anchor="middle" opacity="0">w=0.2</text>
+    <text id="wl-m2-p3" x="516" y="325" font-family="Fira Code" font-size="8" fill="#b47bff" text-anchor="middle" opacity="0">w=0.6</text>
+    <!-- L3→Out -->
+    <line id="e-p1-o" x1="600" y1="90"  x2="732" y2="222" stroke="#1a1a35" stroke-width="1.3"/>
+    <line id="e-p2-o" x1="600" y1="220" x2="732" y2="228" stroke="#1a1a35" stroke-width="1.3"/>
+    <line id="e-p3-o" x1="600" y1="350" x2="732" y2="234" stroke="#1a1a35" stroke-width="1.3"/>
+    <text id="wl-p1-o" x="666" y="146" font-family="Fira Code" font-size="8" fill="#ffc947" text-anchor="middle" opacity="0">w=0.4</text>
+    <text id="wl-p2-o" x="670" y="220" font-family="Fira Code" font-size="8" fill="#ffc947" text-anchor="middle" opacity="0">w=0.3</text>
+    <text id="wl-p3-o" x="666" y="300" font-family="Fira Code" font-size="8" fill="#ffc947" text-anchor="middle" opacity="0">w=0.3</text>
+    <!-- INPUT NODES -->
+    <circle id="ni-loc"  cx="55" cy="130" r="28" fill="#060610" stroke="#1a1a35" stroke-width="2"/>
+    <text x="55" y="123" font-family="Fira Code" font-size="8" fill="#888" text-anchor="middle">LOC</text>
+    <text x="55" y="136" font-family="Fira Code" font-size="11" fill="#ffc947" text-anchor="middle" font-weight="700">7</text>
+    <circle id="ni-sqft" cx="55" cy="310" r="28" fill="#060610" stroke="#1a1a35" stroke-width="2"/>
+    <text x="55" y="303" font-family="Fira Code" font-size="8" fill="#888" text-anchor="middle">SQFT</text>
+    <text x="55" y="316" font-family="Fira Code" font-size="11" fill="#ffc947" text-anchor="middle" font-weight="700">1000</text>
+    <!-- L1 -->
+    <circle id="nn1" cx="230" cy="90"  r="28" fill="#060610" stroke="#1a1a35" stroke-width="2"/>
+    <text x="230" y="80"  font-family="Fira Code" font-size="7" fill="#b47bff" text-anchor="middle">N1 b=10</text>
+    <text id="vn1" x="230" y="95"  font-family="Fira Code" font-size="10" fill="#ffc947" text-anchor="middle" font-weight="700">?</text>
+    <circle id="nn2" cx="230" cy="220" r="28" fill="#060610" stroke="#1a1a35" stroke-width="2"/>
+    <text x="230" y="210" font-family="Fira Code" font-size="7" fill="#b47bff" text-anchor="middle">N2 b=5</text>
+    <text id="vn2" x="230" y="225" font-family="Fira Code" font-size="10" fill="#ffc947" text-anchor="middle" font-weight="700">?</text>
+    <circle id="nn3" cx="230" cy="350" r="28" fill="#060610" stroke="#1a1a35" stroke-width="2"/>
+    <text x="230" y="340" font-family="Fira Code" font-size="7" fill="#b47bff" text-anchor="middle">N3 b=20</text>
+    <text id="vn3" x="230" y="355" font-family="Fira Code" font-size="10" fill="#ffc947" text-anchor="middle" font-weight="700">?</text>
+    <!-- L2 -->
+    <circle id="nm1" cx="420" cy="175" r="28" fill="#060610" stroke="#1a1a35" stroke-width="2"/>
+    <text x="420" y="165" font-family="Fira Code" font-size="7" fill="#b47bff" text-anchor="middle">M1 b=50</text>
+    <text id="vm1" x="420" y="180" font-family="Fira Code" font-size="10" fill="#ffc947" text-anchor="middle" font-weight="700">?</text>
+    <circle id="nm2" cx="420" cy="285" r="28" fill="#060610" stroke="#1a1a35" stroke-width="2"/>
+    <text x="420" y="275" font-family="Fira Code" font-size="7" fill="#b47bff" text-anchor="middle">M2 b=30</text>
+    <text id="vm2" x="420" y="290" font-family="Fira Code" font-size="10" fill="#ffc947" text-anchor="middle" font-weight="700">?</text>
+    <!-- L3 -->
+    <circle id="np1" cx="600" cy="90"  r="28" fill="#060610" stroke="#1a1a35" stroke-width="2"/>
+    <text x="600" y="80"  font-family="Fira Code" font-size="7" fill="#b47bff" text-anchor="middle">P1 b=15</text>
+    <text id="vp1" x="600" y="95"  font-family="Fira Code" font-size="10" fill="#ffc947" text-anchor="middle" font-weight="700">?</text>
+    <circle id="np2" cx="600" cy="220" r="28" fill="#060610" stroke="#1a1a35" stroke-width="2"/>
+    <text x="600" y="210" font-family="Fira Code" font-size="7" fill="#b47bff" text-anchor="middle">P2 b=20</text>
+    <text id="vp2" x="600" y="225" font-family="Fira Code" font-size="10" fill="#ffc947" text-anchor="middle" font-weight="700">?</text>
+    <circle id="np3" cx="600" cy="350" r="28" fill="#060610" stroke="#1a1a35" stroke-width="2"/>
+    <text x="600" y="340" font-family="Fira Code" font-size="7" fill="#b47bff" text-anchor="middle">P3 b=10</text>
+    <text id="vp3" x="600" y="355" font-family="Fira Code" font-size="10" fill="#ffc947" text-anchor="middle" font-weight="700">?</text>
+    <!-- Output -->
+    <circle id="nout" cx="762" cy="228" r="28" fill="#060610" stroke="#1a1a35" stroke-width="2"/>
+    <text x="762" y="218" font-family="Fira Code" font-size="7" fill="#888" text-anchor="middle">OUTPUT</text>
+    <text id="vout" x="762" y="233" font-family="Fira Code" font-size="10" fill="#ffc947" text-anchor="middle" font-weight="700">?</text>
+  </svg></div>
+
+  <div class="cpanel show" id="cp0">
+    <div class="card"><div class="card-title">Initialization</div>
+    <div class="code"><span class="loc">LOC=7</span>   <span class="sqft">SQFT=1000</span>   Target=<span class="w">$200k</span>
+All outputs = <span class="d">?</span>  Tap → Layer 1 to begin.</div></div>
+  </div>
+  <div class="cpanel" id="cp1">
+    <div class="card"><div class="card-title">Layer 1 — Both Inputs Feed All 3 Neurons</div>
+    <div class="code"><span class="p">N1</span> (b=10): (<span class="loc">0.5×7</span>) + (<span class="sqft">0.3×1000</span>) + 10 = 3.5+300+10 = <span class="w">313.5</span>
+<span class="p">N2</span> (b=5):  (<span class="loc">0.8×7</span>) + (<span class="sqft">0.1×1000</span>) + 5  = 5.6+100+5  = <span class="w">110.6</span>
+<span class="p">N3</span> (b=20): (<span class="loc">0.2×7</span>) + (<span class="sqft">0.6×1000</span>) + 20 = 1.4+600+20 = <span class="w">621.4</span></div></div>
+  </div>
+  <div class="cpanel" id="cp2">
+    <div class="card"><div class="card-title">Layer 2 — 3 Inputs, 3 Weights Each</div>
+    <div class="code"><span class="p">M1</span> (b=50): (313.5×<span class="y">0.4</span>)+(110.6×<span class="y">0.3</span>)+(621.4×<span class="y">0.2</span>)+50 = <span class="w">332.86</span>
+<span class="p">M2</span> (b=30): (313.5×<span class="y">0.2</span>)+(110.6×<span class="y">0.5</span>)+(621.4×<span class="y">0.1</span>)+30 = <span class="w">210.14</span></div></div>
+  </div>
+  <div class="cpanel" id="cp3">
+    <div class="card"><div class="card-title">Layer 3 — 2 Inputs, 2 Weights Each</div>
+    <div class="code"><span class="p">P1</span> (b=15): (332.86×<span class="y">0.5</span>)+(210.14×<span class="y">0.4</span>)+15
+   = 166.43 + 84.06 + 15 = <span class="w">265.49</span>
+
+<span class="p">P2</span> (b=20): (332.86×<span class="y">0.6</span>)+(210.14×<span class="y">0.3</span>)+20
+   = 199.72 + 63.04 + 20 = <span class="w">282.76</span>
+
+<span class="p">P3</span> (b=10): (332.86×<span class="y">0.4</span>)+(210.14×<span class="y">0.5</span>)+10
+   = 133.14 + 105.07 + 10 = <span class="w">248.21</span></div></div>
+  </div>
+  <div class="cpanel" id="cp4">
+    <div class="card"><div class="card-title">Output — Final Prediction (Round 1 — Bad Weights!)</div>
+    <div class="code">(265.49×<span class="y">0.4</span>)+(282.76×<span class="y">0.35</span>)+(248.21×<span class="y">0.25</span>)
+= 106.20 + 98.97 + 62.05
+= <span class="r">267.22</span>  → <span class="r">$267k predicted</span>
+
+Target = <span class="g">$200k</span>
+
+<span class="d">We are $67k too high!
+Now calculate Loss → then fix weights.</span></div></div>
+  </div>
+</div>
+
+<!-- ③ LOSS -->
+<div class="section" id="s2">
+  <div class="sec-header"><div class="sec-num">3</div><div class="sec-title">Loss Calculation</div></div>
+  <div class="why-box">💡 WHY: Loss is a single number measuring how wrong the prediction is. The entire training process exists to minimize this number.</div>
+  <div class="card"><div class="card-title">MSE — Using Our Actual Forward Pass Result</div>
+  <div class="code"><span class="d">From Forward Pass:</span>
+Predicted = <span class="r">267</span>   ← what network output (Round 1)
+Target    = <span class="g">200</span>   ← real house price
+
+<span class="d">Step 1: Compute error</span>
+Error = 267 − 200 = <span class="y">67</span>
+
+<span class="d">Step 2: Square it</span>
+Loss  = 67² = <span class="r">4,489</span>
+
+<span class="d">Why square?</span>
+① (−67)² = 4,489  →  negatives become positive ✅
+② 67²=4,489 vs 7²=49  →  big errors punished more ✅
+Objective: Loss → <span class="g">0</span></div></div>
+  <div class="card"><div class="card-title">Loss Reducing Each Round — Weights Learning</div>
+    <div class="lbar-wrap"><div class="lbar-label">Round 1 — Predicted=$267k  Loss=4,489 😱</div><div class="lbar-bg"><div class="lbar" style="width:100%;background:linear-gradient(90deg,#c0001a,#ff3d6b)">4,489</div></div></div>
+    <div class="lbar-wrap"><div class="lbar-label">Round 2 — Predicted=$248k  Loss=2,304 😬</div><div class="lbar-bg"><div class="lbar" style="width:70%;background:linear-gradient(90deg,#ff3d6b,#ff8c00)">2,304</div></div></div>
+    <div class="lbar-wrap"><div class="lbar-label">Round 3 — Predicted=$232k  Loss=1,024 😐</div><div class="lbar-bg"><div class="lbar" style="width:42%;background:linear-gradient(90deg,#ff8c00,#ffc947)">1,024</div></div></div>
+    <div class="lbar-wrap"><div class="lbar-label">Round 4 — Predicted=$218k  Loss=324 🙂</div><div class="lbar-bg"><div class="lbar" style="width:18%;background:linear-gradient(90deg,#ffc947,#00d68f)">324</div></div></div>
+    <div class="lbar-wrap"><div class="lbar-label">Round 5 — Predicted=$202k  Loss=4 🎉</div><div class="lbar-bg"><div class="lbar" style="width:2%;background:#00d68f">4</div></div></div>
+  </div>
+</div>
+
+<!-- ④ BACKPROP + GRAD DESCENT COMBINED VISUAL -->
+<div class="section" id="s3">
+  <div class="sec-header"><div class="sec-num">4</div><div class="sec-title">Backprop + Weight Update — Animated</div></div>
+  <div class="why-box">💡 WHY: After forward pass gives a wrong prediction, backprop flows BACKWARDS assigning blame (gradients) to each weight. Then gradient descent uses those gradients to update every weight.</div>
+
+  <div class="step-row">
+    <button class="sbtn on"  onclick="bp(0)">① Forward Done</button>
+    <button class="sbtn" onclick="bp(1)">② Compute Loss</button>
+    <button class="sbtn" onclick="bp(2)">③ Backprop Signal</button>
+    <button class="sbtn" onclick="bp(3)">④ Gradients</button>
+    <button class="sbtn" onclick="bp(4)">⑤ Update Weights</button>
+    <button class="sbtn" onclick="bp(5)">⑥ New Prediction</button>
+  </div>
+
+  <!-- BACKPROP SVG — simplified 2-layer for clarity -->
+  <div class="svgwrap">
+  <svg id="bsvg" viewBox="0 0 700 320" width="100%" xmlns="http://www.w3.org/2000/svg">
+    <!-- Labels -->
+    <text x="80"  y="18" font-family="Fira Code" font-size="9" fill="#222244" text-anchor="middle">INPUT</text>
+    <text x="260" y="18" font-family="Fira Code" font-size="9" fill="#222244" text-anchor="middle">LAYER 1</text>
+    <text x="450" y="18" font-family="Fira Code" font-size="9" fill="#222244" text-anchor="middle">OUTPUT</text>
+    <text x="610" y="18" font-family="Fira Code" font-size="9" fill="#222244" text-anchor="middle">LOSS</text>
+
+    <!-- Edges -->
+    <line id="be-i-n1" x1="108" y1="112" x2="230" y2="100" stroke="#1a1a35" stroke-width="1.5"/>
+    <line id="be-i-n2" x1="108" y1="120" x2="230" y2="200" stroke="#1a1a35" stroke-width="1.5"/>
+    <line id="be-i-n3" x1="108" y1="128" x2="230" y2="298" stroke="#1a1a35" stroke-width="1.5"/>
+    <line id="be-n1-o" x1="290" y1="100" x2="420" y2="195" stroke="#1a1a35" stroke-width="1.5"/>
+    <line id="be-n2-o" x1="290" y1="200" x2="420" y2="200" stroke="#1a1a35" stroke-width="1.5"/>
+    <line id="be-n3-o" x1="290" y1="298" x2="420" y2="205" stroke="#1a1a35" stroke-width="1.5"/>
+    <line id="be-o-l"  x1="480" y1="200" x2="570" y2="200" stroke="#1a1a35" stroke-width="1.5"/>
+
+    <!-- Weight labels on edges (shown at step 3+) -->
+    <!-- Forward weights -->
+    <text id="bwf-i-n1" x="162" y="96"  font-family="Fira Code" font-size="8" fill="#00d68f" text-anchor="middle" opacity="0">w=0.5</text>
+    <text id="bwf-i-n2" x="155" y="158" font-family="Fira Code" font-size="8" fill="#00d68f" text-anchor="middle" opacity="0">w=0.8</text>
+    <text id="bwf-i-n3" x="150" y="228" font-family="Fira Code" font-size="8" fill="#00d68f" text-anchor="middle" opacity="0">w=0.2</text>
+
+    <!-- Gradient labels (shown at step 4) -->
+    <text id="bg-n1" x="355" y="138" font-family="Fira Code" font-size="8" fill="#ff3d6b" text-anchor="middle" opacity="0">∇=134k</text>
+    <text id="bg-n2" x="355" y="198" font-family="Fira Code" font-size="8" fill="#ff3d6b" text-anchor="middle" opacity="0">∇=134k</text>
+    <text id="bg-n3" x="355" y="260" font-family="Fira Code" font-size="8" fill="#ff3d6b" text-anchor="middle" opacity="0">∇=134k</text>
+
+    <!-- NEW weight labels (shown at step 5) -->
+    <text id="bnw-i-n1" x="162" y="86"  font-family="Fira Code" font-size="8" fill="#00d68f" text-anchor="middle" opacity="0">w=0.37✅</text>
+    <text id="bnw-i-n2" x="155" y="175" font-family="Fira Code" font-size="8" fill="#00d68f" text-anchor="middle" opacity="0">w=0.67✅</text>
+    <text id="bnw-i-n3" x="150" y="245" font-family="Fira Code" font-size="8" fill="#00d68f" text-anchor="middle" opacity="0">w=0.07✅</text>
+
+    <!-- INPUT NODE -->
+    <circle id="bi"  cx="80"  cy="120" r="28" fill="#060610" stroke="#1a1a35" stroke-width="2"/>
+    <text x="80"  y="113" font-family="Fira Code" font-size="7" fill="#888" text-anchor="middle">INPUT</text>
+    <text x="80"  y="126" font-family="Fira Code" font-size="9" fill="#ffc947" text-anchor="middle">1000</text>
+
+    <!-- L1 NEURONS -->
+    <circle id="bn1" cx="260" cy="100" r="28" fill="#060610" stroke="#1a1a35" stroke-width="2"/>
+    <text x="260" y="90"  font-family="Fira Code" font-size="7" fill="#b47bff" text-anchor="middle">N1 b=10</text>
+    <text id="bvn1" x="260" y="105" font-family="Fira Code" font-size="9" fill="#ffc947" text-anchor="middle">313.5</text>
+
+    <circle id="bn2" cx="260" cy="200" r="28" fill="#060610" stroke="#1a1a35" stroke-width="2"/>
+    <text x="260" y="190" font-family="Fira Code" font-size="7" fill="#b47bff" text-anchor="middle">N2 b=5</text>
+    <text id="bvn2" x="260" y="205" font-family="Fira Code" font-size="9" fill="#ffc947" text-anchor="middle">110.6</text>
+
+    <circle id="bn3" cx="260" cy="298" r="28" fill="#060610" stroke="#1a1a35" stroke-width="2"/>
+    <text x="260" y="288" font-family="Fira Code" font-size="7" fill="#b47bff" text-anchor="middle">N3 b=20</text>
+    <text id="bvn3" x="260" y="303" font-family="Fira Code" font-size="9" fill="#ffc947" text-anchor="middle">621.4</text>
+
+    <!-- OUTPUT NEURON -->
+    <circle id="bo"  cx="450" cy="200" r="30" fill="#060610" stroke="#1a1a35" stroke-width="2"/>
+    <text x="450"  y="192" font-family="Fira Code" font-size="7" fill="#888" text-anchor="middle">OUTPUT</text>
+    <text id="bvo"  x="450" y="207" font-family="Fira Code" font-size="10" fill="#ffc947" text-anchor="middle" font-weight="700">267</text>
+
+    <!-- LOSS BOX -->
+    <rect id="blbox" x="570" y="175" width="100" height="50" rx="8" fill="#060610" stroke="#1a1a35" stroke-width="2"/>
+    <text x="620" y="194" font-family="Fira Code" font-size="8" fill="#888" text-anchor="middle">LOSS</text>
+    <text id="blval" x="620" y="212" font-family="Fira Code" font-size="11" fill="#ff3d6b" text-anchor="middle" font-weight="700">4,489</text>
+
+    <!-- BACKPROP ARROW (shown at step 3) -->
+    <path id="bp-arrow" d="M 570,200 Q 490,240 480,205" stroke="#ff3d6b" stroke-width="2.5" fill="none" stroke-dasharray="6,3" marker-end="url(#redarr)" opacity="0"/>
+    <text id="bp-label" x="520" y="248" font-family="Fira Code" font-size="9" fill="#ff3d6b" text-anchor="middle" opacity="0">← blame signal</text>
+
+    <defs>
+      <marker id="redarr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L8,3 z" fill="#ff3d6b"/>
+      </marker>
+      <marker id="greenarr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L8,3 z" fill="#00d68f"/>
+      </marker>
+    </defs>
+  </svg>
+  </div>
+
+  <!-- BACKPROP CALC PANELS -->
+  <div class="cpanel show" id="bp0">
+    <div class="card"><div class="card-title">Step ① — Forward Pass Complete</div>
+    <div class="code"><span class="g">Forward pass complete:</span>
+LOC=7, SQFT=1000 → L1 → L2 → L3 → Output = <span class="r">267</span>
+
+Predicted = <span class="r">$267k</span>   Target = <span class="g">$200k</span>
+<span class="d">Network is $67k too high.
+Now go BACKWARDS to find which weights caused this.</span></div></div>
+  </div>
+
+  <div class="cpanel" id="bp1">
+    <div class="card"><div class="card-title">Step ② — Compute Loss</div>
+    <div class="code">Loss = (Predicted − Target)²
+     = (267 − 200)²
+     = 67²
+     = <span class="r">4,489</span>
+
+<span class="d">This is our error score.
+Backprop will now find WHO caused this 4,489.</span></div></div>
+  </div>
+
+  <div class="cpanel" id="bp2">
+    <div class="card"><div class="card-title">Step ③ — Backprop Signal Flows Backwards</div>
+    <div class="code"><span class="r">← Red signal travels from Loss back to every weight</span>
+
+Loss → Output → Layer 3 → Layer 2 → Layer 1 → Weights
+
+The signal carries one question per weight:
+<span class="y">"How much did YOU contribute to this 4,489 loss?"</span>
+
+<span class="d">Green = forward direction
+Red   = backward blame direction</span></div></div>
+  </div>
+
+  <div class="cpanel" id="bp3">
+    <div class="card"><div class="card-title">Step ④ — Gradient Computed Per Weight</div>
+    <div class="code"><span class="d">Chain Rule — 3 steps:</span>
+
+Step 1: dLoss/dPrediction
+= 2 × (267 − 200) = 2 × 67 = <span class="r">134</span>
+
+Step 2: dPrediction/dWeight = Input = <span class="b">1000</span>
+
+Step 3: Chain = 134 × 1000 = <span class="r">134,000</span>  ← Weight gradient
+              = 134 × 1    = <span class="r">134</span>       ← Bias gradient
+
+<span class="y">134,000 = how much W_sqft→N1 hurt the loss.</span></div></div>
+  </div>
+
+  <div class="cpanel" id="bp4">
+    <div class="card"><div class="card-title">Step ⑤ — Weights Updated</div>
+    <div class="code"><span class="d">W_new = W_old − (LR × Gradient)   LR = 0.000001</span>
+
+<span class="r">W_sqft→N1: 0.300</span> − (0.000001 × 134,000) = <span class="g">0.166 ✅</span>
+<span class="r">W_loc→N1 : 0.500</span> − (0.000001 × 938)     = <span class="g">0.499 ✅</span>
+<span class="r">W_sqft→N2: 0.100</span> − (0.000001 × 134,000) = <span class="g">−0.034</span>
+<span class="r">Bias N1  : 10.00</span> − (0.000001 × 134)     = <span class="g">9.999 ✅</span>
+
+<span class="y">Every weight nudged in the direction that reduces loss!</span></div>
+      <table class="wtable" style="margin-top:10px;">
+        <tr><th>Connection</th><th>Old Weight</th><th></th><th>New Weight</th><th>Direction</th></tr>
+        <tr><td class="p">W_sqft→N1</td><td class="old-w">0.300</td><td class="arrow-cell">→</td><td class="new-w">0.166</td><td class="g">↓ reduced ✅</td></tr>
+        <tr><td class="p">W_loc→N1</td><td class="old-w">0.500</td><td class="arrow-cell">→</td><td class="new-w">0.499</td><td class="g">↓ reduced ✅</td></tr>
+        <tr><td class="p">W_sqft→N2</td><td class="old-w">0.100</td><td class="arrow-cell">→</td><td class="new-w">0.099</td><td class="g">↓ reduced ✅</td></tr>
+        <tr><td class="p">Bias N1</td><td class="old-w">10.00</td><td class="arrow-cell">→</td><td class="new-w">9.999</td><td class="g">↓ reduced ✅</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="cpanel" id="bp5">
+    <div class="card"><div class="card-title">Step ⑥ — Loss Drops Each Round</div>
+    <div class="code"><span class="d">Round 1:</span> Pred=<span class="r">$267k</span>  Loss=<span class="r">4,489</span>  ← starting point
+<span class="d">Round 2:</span> Pred=<span class="y">$248k</span>  Loss=<span class="y">2,304</span>
+<span class="d">Round 3:</span> Pred=<span class="y">$232k</span>  Loss=<span class="y">1,024</span>
+<span class="d">Round 4:</span> Pred=<span class="y">$218k</span>  Loss=<span class="y">324</span>
+<span class="d">Round 5:</span> Pred=<span class="g">$202k</span>  Loss=<span class="g">4</span>     ← nearly done!
+<span class="d">Round 6:</span> Pred=<span class="g">$200k</span>  Loss=<span class="g">0</span>     🎉 perfect!</div>
+
+      <div class="round-box" style="margin-top:10px;">
+        <div class="round-title">WEIGHT LEARNING — LOSS DROPPING EACH ROUND</div>
+        <div class="round-row"><span class="round-num">R1</span><div class="round-bar-bg"><div class="round-bar" style="width:100%;background:#ff3d6b">Pred=$267k</div></div><span class="round-loss">Loss=4,489</span></div>
+        <div class="round-row"><span class="round-num">R2</span><div class="round-bar-bg"><div class="round-bar" style="width:78%;background:#ff6b35">Pred=$248k</div></div><span class="round-loss">Loss=2,304</span></div>
+        <div class="round-row"><span class="round-num">R3</span><div class="round-bar-bg"><div class="round-bar" style="width:52%;background:#ff9500">Pred=$232k</div></div><span class="round-loss">Loss=1,024</span></div>
+        <div class="round-row"><span class="round-num">R4</span><div class="round-bar-bg"><div class="round-bar" style="width:22%;background:#ffc947">Pred=$218k</div></div><span class="round-loss">Loss=324</span></div>
+        <div class="round-row"><span class="round-num">R5</span><div class="round-bar-bg"><div class="round-bar" style="width:4%;background:#80e060">Pred=$202k</div></div><span class="round-loss">Loss=4</span></div>
+        <div class="round-row"><span class="round-num">R6</span><div class="round-bar-bg"><div class="round-bar" style="width:1%;background:#00d68f">$200k</div></div><span class="round-loss r">Loss=0 🎉</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ⑤ GRADIENT DESCENT -->
+<div class="section" id="s4">
+  <div class="sec-header"><div class="sec-num">5</div><div class="sec-title">Gradient Descent — Learning Rate</div></div>
+  <div class="why-box">💡 WHY: Gradient tells us which direction to move the weight. Learning rate controls how big that step is. Wrong learning rate = network never learns.</div>
+  <div class="analogy">
+    <div class="atitle">🏔️ MOUNTAIN — FINDING THE LOWEST VALLEY</div>
+    You are blindfolded on a hill. Goal = reach lowest point = lowest loss.<br><br>
+    <span class="g">Gradient</span> = slope under your feet (which way is down)<br>
+    <span class="y">Learning Rate</span> = size of each step you take
+  </div>
+  <div class="card"><div class="card-title">Learning Rate — Using Our Actual Gradient (134,000)</div>
+  <div class="code"><span class="r">LR=1.0 (too large):</span>
+W = 0.3 − (1.0 × 134,000) = <span class="r">−133,999</span>  ← exploded!
+
+<span class="b">LR=0.0000000001 (too small):</span>
+W = 0.3 − (0.0000000001 × 134,000) = <span class="b">0.2999</span> ← barely moved!
+
+<span class="g">LR=0.000001 (appropriate):</span>
+W = 0.3 − (0.000001 × 134,000) = <span class="g">0.166</span>  ← good step ✅</div></div>
+
+  <!-- LEARNING RATE VISUAL -->
+  <div class="svgwrap">
+  <svg viewBox="0 0 600 200" width="100%" xmlns="http://www.w3.org/2000/svg">
+    <!-- Valley curve -->
+    <path d="M 50,40 Q 150,180 300,185 Q 450,180 550,40" stroke="#1a1a35" stroke-width="2" fill="none"/>
+    <text x="300" y="198" font-family="Fira Code" font-size="9" fill="#00d68f" text-anchor="middle">← minimum (Loss=0)</text>
+    <!-- Too large step -->
+    <circle cx="100" cy="95" r="7" fill="#ff3d6b"/>
+    <line x1="100" y1="95" x2="490" y2="95" stroke="#ff3d6b" stroke-width="2" stroke-dasharray="5,3"/>
+    <circle cx="490" cy="95" r="7" fill="#ff3d6b"/>
+    <text x="295" y="85" font-family="Fira Code" font-size="8" fill="#ff3d6b" text-anchor="middle">LR too large → overshoots!</text>
+    <!-- Just right steps -->
+    <circle cx="100" cy="95" r="5" fill="#00d68f"/>
+    <circle cx="175" cy="155" r="5" fill="#00d68f"/>
+    <circle cx="230" cy="175" r="5" fill="#00d68f"/>
+    <circle cx="270" cy="183" r="5" fill="#00d68f"/>
+    <circle cx="298" cy="185" r="5" fill="#00d68f"/>
+    <line x1="100" y1="95" x2="175" y2="155" stroke="#00d68f" stroke-width="1.5"/>
+    <line x1="175" y1="155" x2="230" y2="175" stroke="#00d68f" stroke-width="1.5"/>
+    <line x1="230" y1="175" x2="270" y2="183" stroke="#00d68f" stroke-width="1.5"/>
+    <line x1="270" y1="183" x2="298" y2="185" stroke="#00d68f" stroke-width="1.5"/>
+    <text x="175" y="140" font-family="Fira Code" font-size="8" fill="#00d68f">LR just right ✅</text>
+    <!-- Too small -->
+    <circle cx="100" cy="95" r="4" fill="#00c8d4"/>
+    <circle cx="108" cy="102" r="4" fill="#00c8d4"/>
+    <circle cx="116" cy="109" r="4" fill="#00c8d4"/>
+    <text x="60" y="125" font-family="Fira Code" font-size="8" fill="#00c8d4">LR too small →</text>
+    <text x="60" y="137" font-family="Fira Code" font-size="8" fill="#00c8d4">too slow!</text>
+  </svg>
+  </div>
+</div>
+
+<!-- ⑥ VANISHING -->
+<div class="section" id="s5">
+  <div class="sec-header"><div class="sec-num">6</div><div class="sec-title">Vanishing Gradient — Watch Signal Die</div></div>
+  <div class="why-box">💡 WHY: Gradient flows backwards from output to input. At each layer it gets multiplied by a small number and shrinks. By Layer 1 it is nearly zero — that layer stops learning entirely.</div>
+
+  <div class="step-row">
+    <button class="sbtn on"  onclick="vg(0)">① Start at Output</button>
+    <button class="sbtn" onclick="vg(1)">② Layer 3</button>
+    <button class="sbtn" onclick="vg(2)">③ Layer 2</button>
+    <button class="sbtn" onclick="vg(3)">④ Layer 1</button>
+    <button class="sbtn" onclick="vg(4)">⑤ Dead!</button>
+  </div>
+
+  <div class="svgwrap">
+  <svg id="vgsvg" viewBox="0 0 680 200" width="100%" xmlns="http://www.w3.org/2000/svg">
+    <!-- Labels -->
+    <text x="80"  y="16" font-family="Fira Code" font-size="9" fill="#222244" text-anchor="middle">OUTPUT</text>
+    <text x="230" y="16" font-family="Fira Code" font-size="9" fill="#222244" text-anchor="middle">LAYER 3</text>
+    <text x="390" y="16" font-family="Fira Code" font-size="9" fill="#222244" text-anchor="middle">LAYER 2</text>
+    <text x="550" y="16" font-family="Fira Code" font-size="9" fill="#222244" text-anchor="middle">LAYER 1</text>
+
+    <!-- Backward arrows -->
+    <line id="vga1" x1="140" y1="100" x2="175" y2="100" stroke="#1a1a35" stroke-width="2"/>
+    <line id="vga2" x1="290" y1="100" x2="335" y2="100" stroke="#1a1a35" stroke-width="2"/>
+    <line id="vga3" x1="450" y1="100" x2="495" y2="100" stroke="#1a1a35" stroke-width="2"/>
+
+    <!-- Gradient signal bars (vertical bars showing strength) -->
+    <!-- At output: 700 -->
+    <rect x="55" y="40" width="50" height="120" rx="5" fill="#0a0a14" stroke="#1a1a35" stroke-width="1"/>
+    <rect id="vgbar0" x="55" y="160" width="50" height="0" rx="5" fill="#00d68f"/>
+    <text x="80" y="178" font-family="Fira Code" font-size="8" fill="#888" text-anchor="middle">grad</text>
+    <text id="vgval0" x="80" y="188" font-family="Fira Code" font-size="9" fill="#ffc947" text-anchor="middle" font-weight="600">?</text>
+
+    <!-- Layer 3 -->
+    <rect x="205" y="40" width="50" height="120" rx="5" fill="#0a0a14" stroke="#1a1a35" stroke-width="1"/>
+    <rect id="vgbar1" x="205" y="160" width="50" height="0" rx="5" fill="#00d68f"/>
+    <text x="230" y="178" font-family="Fira Code" font-size="8" fill="#888" text-anchor="middle">grad</text>
+    <text id="vgval1" x="230" y="188" font-family="Fira Code" font-size="9" fill="#ffc947" text-anchor="middle" font-weight="600">?</text>
+
+    <!-- Layer 2 -->
+    <rect x="365" y="40" width="50" height="120" rx="5" fill="#0a0a14" stroke="#1a1a35" stroke-width="1"/>
+    <rect id="vgbar2" x="365" y="160" width="50" height="0" rx="5" fill="#00d68f"/>
+    <text x="390" y="178" font-family="Fira Code" font-size="8" fill="#888" text-anchor="middle">grad</text>
+    <text id="vgval2" x="390" y="188" font-family="Fira Code" font-size="9" fill="#ffc947" text-anchor="middle" font-weight="600">?</text>
+
+    <!-- Layer 1 -->
+    <rect x="525" y="40" width="50" height="120" rx="5" fill="#0a0a14" stroke="#1a1a35" stroke-width="1"/>
+    <rect id="vgbar3" x="525" y="160" width="50" height="0" rx="5" fill="#00d68f"/>
+    <text x="550" y="178" font-family="Fira Code" font-size="8" fill="#888" text-anchor="middle">grad</text>
+    <text id="vgval3" x="550" y="188" font-family="Fira Code" font-size="9" fill="#ffc947" text-anchor="middle" font-weight="600">?</text>
+
+    <!-- Dead label -->
+    <text id="vgdead" x="550" y="55" font-family="Fira Code" font-size="11" fill="#ff3d6b" text-anchor="middle" opacity="0">DEAD ☠️</text>
+    <text id="vglearn" x="550" y="68" font-family="Fira Code" font-size="8" fill="#ff3d6b" text-anchor="middle" opacity="0">not learning!</text>
+  </svg>
+  </div>
+
+  <div class="cpanel show" id="vgp0">
+    <div class="card"><div class="card-title">Gradient Starts at Output — Strong Signal</div>
+    <div class="code">Backprop begins at the output layer.
+Gradient = <span class="g">700</span>  ← strong signal
+
+This signal must travel ALL the way back
+to Layer 1 to update early weights.
+
+<span class="d">Watch what happens as it passes each layer...</span></div></div>
+  </div>
+  <div class="cpanel" id="vgp1">
+    <div class="card"><div class="card-title">Reaches Layer 3 — Still OK</div>
+    <div class="code">Output gradient:  <span class="g">700</span>
+× Sigmoid derivative: 0.1
+= Layer 3 gradient: <span class="y">70</span>
+
+<span class="d">Still usable. Layer 3 can learn.</span></div></div>
+  </div>
+  <div class="cpanel" id="vgp2">
+    <div class="card"><div class="card-title">Reaches Layer 2 — Getting Weak</div>
+    <div class="code">Layer 3 gradient: <span class="y">70</span>
+× Sigmoid derivative: 0.1
+= Layer 2 gradient: <span class="y">7</span>
+
+<span class="d">Getting small. Layer 2 learns slowly.</span></div></div>
+  </div>
+  <div class="cpanel" id="vgp3">
+    <div class="card"><div class="card-title">Reaches Layer 1 — Nearly Dead</div>
+    <div class="code">Layer 2 gradient: <span class="y">7</span>
+× Sigmoid derivative: 0.1
+= Layer 1 gradient: <span class="r">0.7</span>
+
+<span class="r">Almost zero. Layer 1 barely updates.</span>
+<span class="d">Weight change = 0.0001 × 0.7 = 0.00007
+That is nearly nothing!</span></div></div>
+  </div>
+  <div class="cpanel" id="vgp4">
+    <div class="card"><div class="card-title">Layer 1 is Dead — The Big Problem</div>
+    <div class="code"><span class="r">Layer 1 gradient ≈ 0 → weight barely changes</span>
+
+Layer 1 learns BASIC patterns:
+  → "location matters"
+  → "larger houses cost more"
+
+If Layer 1 never learns these basics,
+Layers 2, 3 build on garbage.
+<span class="r">The entire network fails.</span>
+
+<span class="y">Solution: ReLU activation (next tab →)</span></div></div>
+  </div>
+</div>
+
+<!-- ⑦ RELU -->
+<div class="section" id="s6">
+  <div class="sec-header"><div class="sec-num">7</div><div class="sec-title">ReLU — Watch Numbers Transform</div></div>
+  <div class="why-box">💡 WHY: After each neuron calculates its value, ReLU decides: keep it or kill it. Negative = useless signal = set to 0. Positive = useful = pass through unchanged.</div>
+
+  <div class="step-row">
+    <button class="sbtn on"  onclick="relu(0)">① Raw Outputs</button>
+    <button class="sbtn" onclick="relu(1)">② Apply ReLU</button>
+    <button class="sbtn" onclick="relu(2)">③ What Passes</button>
+    <button class="sbtn" onclick="relu(3)">④ Why It Helps</button>
+  </div>
+
+  <div class="svgwrap">
+  <svg id="rsvg" viewBox="0 0 680 260" width="100%" xmlns="http://www.w3.org/2000/svg">
+    <text x="100" y="18" font-family="Fira Code" font-size="9" fill="#222244" text-anchor="middle">RAW VALUE</text>
+    <text x="340" y="18" font-family="Fira Code" font-size="9" fill="#222244" text-anchor="middle">ReLU GATE</text>
+    <text x="570" y="18" font-family="Fira Code" font-size="9" fill="#222244" text-anchor="middle">OUTPUT</text>
+
+    <!-- N1: positive -->
+    <circle id="rn1" cx="100" cy="70"  r="32" fill="#060610" stroke="#1a1a35" stroke-width="2"/>
+    <text x="100" y="63"  font-family="Fira Code" font-size="8" fill="#888" text-anchor="middle">N1</text>
+    <text id="rv1" x="100" y="78"  font-family="Fira Code" font-size="11" fill="#ffc947" text-anchor="middle" font-weight="700">313.5</text>
+
+    <!-- N2: positive -->
+    <circle id="rn2" cx="100" cy="150" r="32" fill="#060610" stroke="#1a1a35" stroke-width="2"/>
+    <text x="100" y="143" font-family="Fira Code" font-size="8" fill="#888" text-anchor="middle">N2</text>
+    <text id="rv2" x="100" y="158" font-family="Fira Code" font-size="11" fill="#ffc947" text-anchor="middle" font-weight="700">110.6</text>
+
+    <!-- N3: NEGATIVE -->
+    <circle id="rn3" cx="100" cy="230" r="32" fill="#060610" stroke="#1a1a35" stroke-width="2"/>
+    <text x="100" y="223" font-family="Fira Code" font-size="8" fill="#888" text-anchor="middle">N3</text>
+    <text id="rv3" x="100" y="238" font-family="Fira Code" font-size="11" fill="#ffc947" text-anchor="middle" font-weight="700">−85.0</text>
+
+    <!-- Arrows to gate -->
+    <line id="ra1" x1="132" y1="70"  x2="258" y2="100" stroke="#1a1a35" stroke-width="1.5"/>
+    <line id="ra2" x1="132" y1="150" x2="258" y2="150" stroke="#1a1a35" stroke-width="1.5"/>
+    <line id="ra3" x1="132" y1="230" x2="258" y2="200" stroke="#1a1a35" stroke-width="1.5"/>
+
+    <!-- GATE boxes -->
+    <rect id="rg1" x="260" y="78"  width="120" height="44" rx="8" fill="#060610" stroke="#1a1a35" stroke-width="1.5"/>
+    <text id="rgt1" x="320" y="96"  font-family="Fira Code" font-size="8" fill="#888" text-anchor="middle">ReLU gate</text>
+    <text id="rgv1" x="320" y="112" font-family="Fira Code" font-size="9" fill="#ffc947" text-anchor="middle">max(0, 313.5)</text>
+
+    <rect id="rg2" x="260" y="128" width="120" height="44" rx="8" fill="#060610" stroke="#1a1a35" stroke-width="1.5"/>
+    <text id="rgt2" x="320" y="146" font-family="Fira Code" font-size="8" fill="#888" text-anchor="middle">ReLU gate</text>
+    <text id="rgv2" x="320" y="162" font-family="Fira Code" font-size="9" fill="#ffc947" text-anchor="middle">max(0, 110.6)</text>
+
+    <rect id="rg3" x="260" y="178" width="120" height="44" rx="8" fill="#060610" stroke="#1a1a35" stroke-width="1.5"/>
+    <text id="rgt3" x="320" y="196" font-family="Fira Code" font-size="8" fill="#888" text-anchor="middle">ReLU gate</text>
+    <text id="rgv3" x="320" y="212" font-family="Fira Code" font-size="9" fill="#ffc947" text-anchor="middle">max(0, −85.0)</text>
+
+    <!-- Arrows to output -->
+    <line id="rb1" x1="380" y1="100" x2="498" y2="70"  stroke="#1a1a35" stroke-width="1.5"/>
+    <line id="rb2" x1="380" y1="150" x2="498" y2="150" stroke="#1a1a35" stroke-width="1.5"/>
+    <line id="rb3" x1="380" y1="200" x2="498" y2="230" stroke="#1a1a35" stroke-width="1.5"/>
+
+    <!-- Output nodes -->
+    <circle id="ro1" cx="530" cy="70"  r="32" fill="#060610" stroke="#1a1a35" stroke-width="2"/>
+    <text x="530" y="63"  font-family="Fira Code" font-size="8" fill="#888" text-anchor="middle">OUT</text>
+    <text id="rov1" x="530" y="78"  font-family="Fira Code" font-size="11" fill="#ffc947" text-anchor="middle" font-weight="700">?</text>
+
+    <circle id="ro2" cx="530" cy="150" r="32" fill="#060610" stroke="#1a1a35" stroke-width="2"/>
+    <text x="530" y="143" font-family="Fira Code" font-size="8" fill="#888" text-anchor="middle">OUT</text>
+    <text id="rov2" x="530" y="158" font-family="Fira Code" font-size="11" fill="#ffc947" text-anchor="middle" font-weight="700">?</text>
+
+    <circle id="ro3" cx="530" cy="230" r="32" fill="#060610" stroke="#1a1a35" stroke-width="2"/>
+    <text x="530" y="223" font-family="Fira Code" font-size="8" fill="#888" text-anchor="middle">OUT</text>
+    <text id="rov3" x="530" y="238" font-family="Fira Code" font-size="11" fill="#ffc947" text-anchor="middle" font-weight="700">?</text>
+
+    <!-- CROSS symbol for killed neuron (hidden initially) -->
+    <text id="rcross" x="530" y="238" font-family="Fira Code" font-size="18" fill="#ff3d6b" text-anchor="middle" opacity="0">✕</text>
+    <text id="rkilled" x="600" y="238" font-family="Fira Code" font-size="9" fill="#ff3d6b" text-anchor="start" opacity="0">KILLED!</text>
+    <text id="rpassed" x="600" y="78"  font-family="Fira Code" font-size="9" fill="#00d68f" text-anchor="start" opacity="0">PASSED ✅</text>
+    <text id="rpassed2" x="600" y="158" font-family="Fira Code" font-size="9" fill="#00d68f" text-anchor="start" opacity="0">PASSED ✅</text>
+  </svg>
+  </div>
+
+  <div class="cpanel show" id="rp0">
+    <div class="card"><div class="card-title">Raw Neuron Outputs — Before ReLU</div>
+    <div class="code">After calculations, Layer 1 produced:
+
+N1 = <span class="y">313.5</span>   ← positive
+N2 = <span class="y">110.6</span>   ← positive
+N3 = <span class="r">−85.0</span>   ← NEGATIVE!
+
+<span class="d">Without ReLU: all 3 pass to next layer.
+Negative values confuse the network.
+Tap → Apply ReLU to see what happens.</span></div></div>
+  </div>
+
+  <div class="cpanel" id="rp1">
+    <div class="card"><div class="card-title">ReLU Applied — max(0, x)</div>
+    <div class="code">ReLU Rule:
+  If x &gt; 0 → keep it     (gate OPENS)
+  If x ≤ 0 → make it 0  (gate CLOSES)
+
+N1: max(0, <span class="y"> 313.5</span>) = <span class="g">313.5</span>  ✅ gate opens
+N2: max(0, <span class="y"> 110.6</span>) = <span class="g">110.6</span>  ✅ gate opens
+N3: max(0, <span class="r">−85.0</span>)  = <span class="r">0</span>      ❌ gate CLOSES</div></div>
+  </div>
+
+  <div class="cpanel" id="rp2">
+    <div class="card"><div class="card-title">What Passes to Next Layer</div>
+    <div class="code"><span class="g">313.5</span> → passes to Layer 2 ✅
+<span class="g">110.6</span> → passes to Layer 2 ✅
+<span class="r">0</span>     → passes to Layer 2 (but has no effect)
+
+<span class="d">N3 is now "dead" for this input.
+It contributes nothing to the next layer.
+Only meaningful signals flow forward.</span></div></div>
+  </div>
+
+  <div class="cpanel" id="rp3">
+    <div class="card"><div class="card-title">Why ReLU Fixes Vanishing Gradient</div>
+    <div class="code"><span class="d">Old function (Sigmoid) squished everything:</span>
+Gradient: 700 × 0.2 × 0.2 × 0.2 = <span class="r">5.6</span>  ← dying
+
+<span class="d">ReLU derivative = 1 for positive values:</span>
+Gradient: 700 × 1.0 × 1.0 × 1.0 = <span class="g">700</span>  ← alive! ✅
+
+<span class="d">ReLU used:</span> INSIDE network after every hidden layer
+<span class="d">NOT used:</span>  At output (use Softmax there for classification)</div></div>
+  </div>
+</div>
+
+<!-- ⑧ SOFTMAX -->
+<div class="section" id="s7">
+  <div class="sec-header"><div class="sec-num">8</div><div class="sec-title">Softmax — Watch Scores Become Probabilities</div></div>
+  <div class="why-box">💡 WHY: At the OUTPUT layer for classification, we need probabilities not raw scores. Softmax converts any numbers into percentages that always add to exactly 100%.</div>
+
+  <div class="step-row">
+    <button class="sbtn on"  onclick="smx(0)">① Raw Scores</button>
+    <button class="sbtn" onclick="smx(1)">② Apply Softmax</button>
+    <button class="sbtn" onclick="smx(2)">③ Probabilities</button>
+    <button class="sbtn" onclick="smx(3)">④ When To Use</button>
+  </div>
+
+  <div class="svgwrap">
+  <svg id="ssvg" viewBox="0 0 660 280" width="100%" xmlns="http://www.w3.org/2000/svg">
+    <!-- Output neurons with raw scores -->
+    <text x="90" y="18" font-family="Fira Code" font-size="9" fill="#222244" text-anchor="middle">OUTPUT LAYER</text>
+    <text x="340" y="18" font-family="Fira Code" font-size="9" fill="#222244" text-anchor="middle">SOFTMAX</text>
+    <text x="560" y="18" font-family="Fira Code" font-size="9" fill="#222244" text-anchor="middle">PROBABILITY</text>
+
+    <!-- Raw score nodes -->
+    <circle id="sc1" cx="90" cy="70"  r="32" fill="#060610" stroke="#1a1a35" stroke-width="2"/>
+    <text x="90" y="62"  font-family="Fira Code" font-size="8" fill="#888" text-anchor="middle">CAT</text>
+    <text id="sv1" x="90" y="78"  font-family="Fira Code" font-size="12" fill="#ffc947" text-anchor="middle" font-weight="700">8.5</text>
+
+    <circle id="sc2" cx="90" cy="150" r="32" fill="#060610" stroke="#1a1a35" stroke-width="2"/>
+    <text x="90" y="142" font-family="Fira Code" font-size="8" fill="#888" text-anchor="middle">DOG</text>
+    <text id="sv2" x="90" y="158" font-family="Fira Code" font-size="12" fill="#ffc947" text-anchor="middle" font-weight="700">3.2</text>
+
+    <circle id="sc3" cx="90" cy="230" r="32" fill="#060610" stroke="#1a1a35" stroke-width="2"/>
+    <text x="90" y="222" font-family="Fira Code" font-size="8" fill="#888" text-anchor="middle">BIRD</text>
+    <text id="sv3" x="90" y="238" font-family="Fira Code" font-size="12" fill="#ffc947" text-anchor="middle" font-weight="700">1.1</text>
+
+    <!-- Arrows to softmax box -->
+    <line id="sa1" x1="122" y1="70"  x2="218" y2="120" stroke="#1a1a35" stroke-width="1.5"/>
+    <line id="sa2" x1="122" y1="150" x2="218" y2="145" stroke="#1a1a35" stroke-width="1.5"/>
+    <line id="sa3" x1="122" y1="230" x2="218" y2="175" stroke="#1a1a35" stroke-width="1.5"/>
+
+    <!-- SOFTMAX box -->
+    <rect id="smbox" x="220" y="100" width="140" height="100" rx="10" fill="#0a0a18" stroke="#1a1a35" stroke-width="2"/>
+    <text x="290" y="128" font-family="Fira Code" font-size="9" fill="#b47bff" text-anchor="middle">SOFTMAX</text>
+    <text x="290" y="148" font-family="Fira Code" font-size="8" fill="#44446a" text-anchor="middle">e^x / Σe^x</text>
+    <text id="smtotal" x="290" y="168" font-family="Fira Code" font-size="9" fill="#ffc947" text-anchor="middle" opacity="0">sum = 100% ✅</text>
+
+    <!-- Arrows from softmax to probability bars -->
+    <line id="sb1" x1="360" y1="125" x2="418" y2="70"  stroke="#1a1a35" stroke-width="1.5"/>
+    <line id="sb2" x1="360" y1="150" x2="418" y2="150" stroke="#1a1a35" stroke-width="1.5"/>
+    <line id="sb3" x1="360" y1="175" x2="418" y2="230" stroke="#1a1a35" stroke-width="1.5"/>
+
+    <!-- Probability bars -->
+    <!-- CAT bar -->
+    <rect x="420" y="48" width="180" height="44" rx="5" fill="#06060f" stroke="#1a1a35" stroke-width="1"/>
+    <rect id="pbar1" x="420" y="48" width="0" height="44" rx="5" fill="#00d68f"/>
+    <text id="pval1" x="430" y="76" font-family="Fira Code" font-size="11" fill="#fff" font-weight="700" opacity="0">Cat = 84%</text>
+
+    <!-- DOG bar -->
+    <rect x="420" y="128" width="180" height="44" rx="5" fill="#06060f" stroke="#1a1a35" stroke-width="1"/>
+    <rect id="pbar2" x="420" y="128" width="0" height="44" rx="5" fill="#ffc947"/>
+    <text id="pval2" x="430" y="156" font-family="Fira Code" font-size="11" fill="#fff" font-weight="700" opacity="0">Dog = 13%</text>
+
+    <!-- BIRD bar -->
+    <rect x="420" y="208" width="180" height="44" rx="5" fill="#06060f" stroke="#1a1a35" stroke-width="1"/>
+    <rect id="pbar3" x="420" y="208" width="0" height="44" rx="5" fill="#00c8d4"/>
+    <text id="pval3" x="430" y="236" font-family="Fira Code" font-size="11" fill="#fff" font-weight="700" opacity="0">Bird = 3%</text>
+
+    <!-- Winner badge -->
+    <text id="swinner" x="610" y="76" font-family="Fira Code" font-size="10" fill="#ffc947" text-anchor="middle" opacity="0">🏆</text>
+  </svg>
+  </div>
+
+  <div class="cpanel show" id="sp0">
+    <div class="card"><div class="card-title">Raw Scores — Network Output Before Softmax</div>
+    <div class="code">Network classified an image. Raw output scores:
+
+Cat  = <span class="y">8.5</span>
+Dog  = <span class="y">3.2</span>
+Bird = <span class="y">1.1</span>
+
+<span class="d">These are just numbers. Not probabilities.
+We cannot say "84% cat" yet.
+Tap → Apply Softmax to convert them.</span></div></div>
+  </div>
+
+  <div class="cpanel" id="sp1">
+    <div class="card"><div class="card-title">Softmax Formula Applied</div>
+    <div class="code">Formula: P(x) = e^x / (e^8.5 + e^3.2 + e^1.1)
+
+e^8.5  = 4914.8
+e^3.2  = 24.5
+e^1.1  = 3.0
+Total  = <span class="y">4942.3</span>
+
+Cat:  4914.8 / 4942.3 = <span class="g">0.84 = 84%</span>
+Dog:  24.5   / 4942.3 = <span class="y">0.13 = 13%</span>
+Bird: 3.0    / 4942.3 = <span class="b">0.03 = 3%</span>
+
+<span class="d">All add to 1.0 = 100% ✅</span></div></div>
+  </div>
+
+  <div class="cpanel" id="sp2">
+    <div class="card"><div class="card-title">Final Probabilities — Network's Answer</div>
+    <div class="code"><span class="g">Cat  = 84%</span>  ← WINNER 🏆
+<span class="y">Dog  = 13%</span>
+<span class="b">Bird = 3%</span>
+─────────────
+Sum  = <span class="w">100%</span> ✅
+
+Network says: <span class="g">"This is a Cat"</span>
+Confidence:   <span class="g">84%</span></div></div>
+  </div>
+
+  <div class="cpanel" id="sp3">
+    <div class="card"><div class="card-title">When To Use Softmax vs Nothing</div>
+    <div class="code"><span class="d">Classification (pick ONE from many):</span>
+Cat / Dog / Bird → <span class="g">USE Softmax</span> ✅
+Spam / Not Spam  → <span class="g">USE Softmax</span> ✅
+
+<span class="d">Regression (predict a number):</span>
+House Price $199k → <span class="r">NO Softmax</span>
+Temperature 36.5° → <span class="r">NO Softmax</span>
+
+<span class="d">ReLU vs Softmax location:</span>
+ReLU    → after every HIDDEN layer
+Softmax → only at OUTPUT layer for classification</div></div>
+  </div>
+</div>
+
+<!-- ⑨ BATCH NORM -->
+<div class="section" id="s8">
+  <div class="sec-header"><div class="sec-num">9</div><div class="sec-title">Batch Normalization — Watch Values Stabilize</div></div>
+  <div class="why-box">💡 WHY: When neuron outputs are wildly different in scale, the next layer struggles to learn. Batch Norm brings all values to a stable centered range — like tuning all instruments to the same pitch before playing.</div>
+
+  <div class="step-row">
+    <button class="sbtn on"  onclick="bn(0)">① Wild Values</button>
+    <button class="sbtn" onclick="bn(1)">② The Problem</button>
+    <button class="sbtn" onclick="bn(2)">③ Apply BN</button>
+    <button class="sbtn" onclick="bn(3)">④ Result</button>
+  </div>
+
+  <div class="svgwrap">
+  <svg id="bnsvg" viewBox="0 0 660 200" width="100%" xmlns="http://www.w3.org/2000/svg">
+    <!-- BEFORE label -->
+    <text x="150" y="18" font-family="Fira Code" font-size="9" fill="#222244" text-anchor="middle">BEFORE BATCH NORM</text>
+    <text x="510" y="18" font-family="Fira Code" font-size="9" fill="#222244" text-anchor="middle">AFTER BATCH NORM</text>
+    <line x1="330" y1="25" x2="330" y2="190" stroke="#1a1a35" stroke-width="1" stroke-dasharray="4,3"/>
+
+    <!-- BEFORE bars (wild) -->
+    <!-- N1: 50000 - tall bar -->
+    <rect x="30"  y="150" width="40" height="5"   rx="3" fill="#1a1a35" id="bnb1bg"/>
+    <rect id="bnb1" x="30" y="155" width="40" height="0" rx="3" fill="#ff3d6b"/>
+    <text x="50" y="168" font-family="Fira Code" font-size="8" fill="#ff3d6b" text-anchor="middle" id="bnbv1">N1</text>
+    <text x="50" y="180" font-family="Fira Code" font-size="8" fill="#ff3d6b" text-anchor="middle" id="bnbn1">50,000</text>
+
+    <!-- N2: 0.003 - tiny bar -->
+    <rect x="130" y="150" width="40" height="5"   rx="3" fill="#1a1a35" id="bnb2bg"/>
+    <rect id="bnb2" x="130" y="155" width="40" height="0" rx="3" fill="#ff3d6b"/>
+    <text x="150" y="168" font-family="Fira Code" font-size="8" fill="#ff3d6b" text-anchor="middle">N2</text>
+    <text x="150" y="180" font-family="Fira Code" font-size="8" fill="#ff3d6b" text-anchor="middle" id="bnbn2">0.003</text>
+
+    <!-- N3: 847 - medium bar -->
+    <rect x="230" y="150" width="40" height="5"   rx="3" fill="#1a1a35"/>
+    <rect id="bnb3" x="230" y="155" width="40" height="0" rx="3" fill="#ff3d6b"/>
+    <text x="250" y="168" font-family="Fira Code" font-size="8" fill="#ff3d6b" text-anchor="middle">N3</text>
+    <text x="250" y="180" font-family="Fira Code" font-size="8" fill="#ff3d6b" text-anchor="middle" id="bnbn3">847</text>
+
+    <!-- AFTER bars (normalized) -->
+    <rect x="370" y="100" width="40" height="55" rx="3" fill="#1a1a35"/>
+    <rect id="bna1" x="370" y="155" width="40" height="0" rx="3" fill="#00d68f"/>
+    <text x="390" y="168" font-family="Fira Code" font-size="8" fill="#00d68f" text-anchor="middle">N1</text>
+    <text x="390" y="180" font-family="Fira Code" font-size="9" fill="#00d68f" text-anchor="middle" id="bnan1">+1.8</text>
+
+    <rect x="470" y="100" width="40" height="55" rx="3" fill="#1a1a35"/>
+    <rect id="bna2" x="470" y="155" width="40" height="0" rx="3" fill="#00d68f"/>
+    <text x="490" y="168" font-family="Fira Code" font-size="8" fill="#00d68f" text-anchor="middle">N2</text>
+    <text x="490" y="180" font-family="Fira Code" font-size="9" fill="#00d68f" text-anchor="middle" id="bnan2">−1.2</text>
+
+    <rect x="570" y="100" width="40" height="55" rx="3" fill="#1a1a35"/>
+    <rect id="bna3" x="570" y="155" width="40" height="0" rx="3" fill="#00d68f"/>
+    <text x="590" y="168" font-family="Fira Code" font-size="8" fill="#00d68f" text-anchor="middle">N3</text>
+    <text x="590" y="180" font-family="Fira Code" font-size="9" fill="#00d68f" text-anchor="middle" id="bnan3">−0.6</text>
+
+    <!-- Center line for normalized -->
+    <line x1="355" y1="127" x2="625" y2="127" stroke="#ffc947" stroke-width="1" stroke-dasharray="3,2" opacity="0" id="bn-center"/>
+    <text id="bn-center-label" x="490" y="123" font-family="Fira Code" font-size="8" fill="#ffc947" text-anchor="middle" opacity="0">centered around 0</text>
+  </svg>
+  </div>
+
+  <div class="cpanel show" id="bnp0">
+    <div class="card"><div class="card-title">Wild Values Entering Next Layer</div>
+    <div class="code">Layer 1 outputs (before normalization):
+
+N1 = <span class="r">50,000</span>   ← enormous!
+N2 = <span class="r">0.003</span>    ← microscopic!
+N3 = <span class="r">847</span>      ← medium
+
+<span class="d">These go into Layer 2 as inputs.
+Layer 2 is completely confused by
+these wildly different scales.</span></div></div>
+  </div>
+
+  <div class="cpanel" id="bnp1">
+    <div class="card"><div class="card-title">The Problem This Causes</div>
+    <div class="code"><span class="d">Layer 2 tries to learn weights for these inputs:</span>
+
+N1=50,000 → weight must be tiny (like 0.000001)
+N2=0.003  → weight must be huge (like 10,000)
+N3=847    → weight must be medium
+
+<span class="r">Gradients become unstable.
+Some explode. Some vanish.
+Network learns very slowly or not at all.</span>
+
+<span class="d">It's like trying to measure both a virus
+and a mountain with the same ruler.</span></div></div>
+  </div>
+
+  <div class="cpanel" id="bnp2">
+    <div class="card"><div class="card-title">Batch Norm Formula Applied</div>
+    <div class="code">Step 1: Find mean
+mean = (50000 + 0.003 + 847) / 3 = <span class="y">16,949</span>
+
+Step 2: Find std deviation = <span class="y">23,094</span>
+
+Step 3: Normalize each value
+x_norm = (x − mean) / std_deviation
+
+N1: (50000 − 16949) / 23094 = <span class="g">+1.8</span>
+N2: (0.003 − 16949) / 23094 = <span class="g">−1.2</span>
+N3: (847   − 16949) / 23094 = <span class="g">−0.6</span></div></div>
+  </div>
+
+  <div class="cpanel" id="bnp3">
+    <div class="card"><div class="card-title">Result — All Values in Healthy Range</div>
+    <div class="code">Before: <span class="r">50,000</span>  <span class="r">0.003</span>  <span class="r">847</span>   ← chaotic
+After:  <span class="g">+1.8</span>    <span class="g">−1.2</span>   <span class="g">−0.6</span>  ← stable ✅
+
+All values now centered around 0.
+Layer 2 can learn with consistent weights.
+Training becomes faster and more stable.
+
+<span class="d">Applied after EVERY layer during forward pass.
+One of the most important tricks in deep learning.</span></div></div>
+  </div>
+</div>
+
+<!-- ⑩ RESIDUAL -->
+<div class="section" id="s9">
+  <div class="sec-header"><div class="sec-num">10</div><div class="sec-title">Residual Connections — Watch the Skip</div></div>
+  <div class="why-box">💡 WHY: Normal path loses gradient at every layer. Skip connection sends gradient directly — bypassing all layers. Layer 1 always gets a strong signal no matter how deep the network.</div>
+
+  <div class="step-row">
+    <button class="sbtn on"  onclick="res(0)">① Normal Path</button>
+    <button class="sbtn" onclick="res(1)">② Signal Dies</button>
+    <button class="sbtn" onclick="res(2)">③ Skip Added</button>
+    <button class="sbtn" onclick="res(3)">④ Both Combine</button>
+  </div>
+
+  <div class="svgwrap">
+  <svg id="resvg" viewBox="0 0 660 220" width="100%" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="rarr-r" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#ff3d6b"/></marker>
+      <marker id="rarr-g" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#00d68f"/></marker>
+      <marker id="rarr-y" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#ffc947"/></marker>
+    </defs>
+
+    <!-- NORMAL PATH -->
+    <text x="330" y="15" font-family="Fira Code" font-size="8" fill="#ff3d6b" text-anchor="middle" id="rnorm-label">← NORMAL PATH (gradient shrinks)</text>
+
+    <!-- Layers boxes -->
+    <rect id="rl3" x="60"  y="80" width="60" height="40" rx="7" fill="#0c0c1a" stroke="#1a1a35" stroke-width="2"/>
+    <text x="90"  y="105" font-family="Fira Code" font-size="10" fill="#888" text-anchor="middle">L3</text>
+    <text id="rg3" x="90" y="72" font-family="Fira Code" font-size="8" fill="#00d68f" text-anchor="middle" opacity="0">grad=700</text>
+
+    <rect id="rl2" x="200" y="80" width="60" height="40" rx="7" fill="#0c0c1a" stroke="#1a1a35" stroke-width="2"/>
+    <text x="230" y="105" font-family="Fira Code" font-size="10" fill="#888" text-anchor="middle">L2</text>
+    <text id="rg2" x="230" y="72" font-family="Fira Code" font-size="8" fill="#ffc947" text-anchor="middle" opacity="0">grad=70</text>
+
+    <rect id="rl1" x="340" y="80" width="60" height="40" rx="7" fill="#0c0c1a" stroke="#1a1a35" stroke-width="2"/>
+    <text x="370" y="105" font-family="Fira Code" font-size="10" fill="#888" text-anchor="middle">L1</text>
+    <text id="rg1" x="370" y="72" font-family="Fira Code" font-size="8" fill="#ff3d6b" text-anchor="middle" opacity="0">grad=7 ❌</text>
+
+    <!-- Normal path arrows (backward direction L3→L2→L1) -->
+    <line id="rn-a1" x1="200" y1="100" x2="125" y2="100" stroke="#1a1a35" stroke-width="2" marker-end="url(#rarr-r)"/>
+    <line id="rn-a2" x1="340" y1="100" x2="265" y2="100" stroke="#1a1a35" stroke-width="2" marker-end="url(#rarr-r)"/>
+
+    <!-- SKIP CONNECTION (curved arc over layers) -->
+    <path id="skip-path" d="M 400,80 Q 370,30 90,80" stroke="#ffc947" stroke-width="3" fill="none" stroke-dasharray="7,3" marker-end="url(#rarr-y)" opacity="0"/>
+    <text id="skip-label" x="245" y="38" font-family="Fira Code" font-size="9" fill="#ffc947" text-anchor="middle" opacity="0">⚡ SKIP CONNECTION — grad=700 direct!</text>
+
+    <!-- Combined result at L1 -->
+    <text id="rcombined" x="370" y="145" font-family="Fira Code" font-size="9" fill="#00d68f" text-anchor="middle" opacity="0">combined = 707 ✅</text>
+
+    <!-- Comparison panel at bottom -->
+    <rect x="30" y="160" width="280" height="50" rx="5" fill="#100000" stroke="#2a0000" stroke-width="1" id="rnorm-box" opacity="0"/>
+    <text id="rnorm-txt1" x="170" y="180" font-family="Fira Code" font-size="8" fill="#ff3d6b" text-anchor="middle" opacity="0">Normal path: L1 gets grad=7</text>
+    <text id="rnorm-txt2" x="170" y="198" font-family="Fira Code" font-size="8" fill="#ff3d6b" text-anchor="middle" opacity="0">Layer 1 barely learns ❌</text>
+
+    <rect x="350" y="160" width="280" height="50" rx="5" fill="#001008" stroke="#002a10" stroke-width="1" id="rskip-box" opacity="0"/>
+    <text id="rskip-txt1" x="490" y="180" font-family="Fira Code" font-size="8" fill="#00d68f" text-anchor="middle" opacity="0">Skip path: L1 gets grad=707</text>
+    <text id="rskip-txt2" x="490" y="198" font-family="Fira Code" font-size="8" fill="#00d68f" text-anchor="middle" opacity="0">Layer 1 learns strongly ✅</text>
+  </svg>
+  </div>
+
+  <div class="cpanel show" id="resp0">
+    <div class="card"><div class="card-title">Normal Path — Gradient Travels Every Layer</div>
+    <div class="code">Backprop signal starts at output.
+Must pass through EVERY layer to reach Layer 1:
+
+Output → L3 → L2 → L1
+
+At each layer it gets multiplied by ~0.1
+<span class="d">Tap → Signal Dies to see what happens.</span></div></div>
+  </div>
+  <div class="cpanel" id="resp1">
+    <div class="card"><div class="card-title">Signal Shrinks at Every Layer</div>
+    <div class="code">Output:  grad = <span class="g">700</span>
+Layer 3: grad = 700 × 0.1 = <span class="y">70</span>
+Layer 2: grad = 70  × 0.1 = <span class="y">7</span>
+Layer 1: grad = 7   × 0.1 = <span class="r">0.7</span> ← dead!
+
+<span class="r">Layer 1 weight update ≈ nothing.</span>
+<span class="d">Now see how skip connection solves this.</span></div></div>
+  </div>
+  <div class="cpanel" id="resp2">
+    <div class="card"><div class="card-title">Skip Connection Added — Direct Highway</div>
+    <div class="code">A shortcut wire is added from L3 directly to L1.
+<span class="y">Gradient skips L2 entirely.</span>
+
+Skip path: Output → <span class="y">directly to L1</span>
+           grad = <span class="g">700</span>  ← unchanged! ✅
+
+No multiplication. No shrinking.
+Signal arrives at full strength.</div></div>
+  </div>
+  <div class="cpanel" id="resp3">
+    <div class="card"><div class="card-title">Both Paths Combine at Layer 1</div>
+    <div class="code">Normal path arrives:  grad = <span class="r">0.7</span>   (weak)
+Skip path arrives:    grad = <span class="g">700</span>   (strong)
+─────────────────────────────────
+Combined at Layer 1:  grad = <span class="g">700.7</span> ✅
+
+<span class="g">Layer 1 now receives strong gradient.
+It learns properly regardless of depth!</span>
+
+<span class="d">Used in ResNet (2015) — enabled 152-layer networks.
+This is why modern networks can be so deep.</span></div></div>
+  </div>
+
+  <div class="card"><div class="card-title">Complete Architecture Summary</div>
+  <div class="code"><span class="g">Weight & Bias</span>       Learnable params, random init
+<span class="b">Forward Pass</span>        Data flows input → output
+<span class="r">Loss (MSE)</span>          (Pred−Target)² → error score
+<span class="p">Backpropagation</span>     Chain rule → gradient per weight
+<span class="y">Gradient Descent</span>    W -= LR × gradient
+<span class="r">Vanishing Gradient</span>  Signal dies in early layers
+<span class="g">ReLU</span>                Gradient=1 → no vanishing
+<span class="b">Softmax</span>             Logits → probability distribution
+<span class="y">Batch Normalization</span> Stabilizes layer activations
+<span class="p">Residual Connections</span> Skip paths → gradient always flows
+
+<span class="w">These are the foundational components of modern deep learning.</span></div></div>
+</div>
+
+</div><!-- end content -->
+<div class="dots" id="dotRow"></div>
+
+<script>
+const N=10;
+const dr=document.getElementById('dotRow');
+for(let i=0;i<N;i++){
+  const d=document.createElement('div');
+  d.className='dot'+(i===0?' on':'');
+  d.onclick=()=>goSec(i);
+  dr.appendChild(d);
+}
+function goSec(i){
+  document.querySelectorAll('.section').forEach((s,j)=>s.classList.toggle('show',j===i));
+  document.querySelectorAll('.tab').forEach((t,j)=>t.classList.toggle('active',j===i));
+  document.querySelectorAll('.dot').forEach((d,j)=>d.classList.toggle('on',j===i));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ---- FORWARD PASS ----
+const FWD={
+  0:{locN:['ni-loc'],sqN:['ni-sqft'],actN:[],locE:[],sqE:[],otE:[],wts:[],vals:{},panel:'cp0'},
+  1:{locN:['ni-loc'],sqN:['ni-sqft'],actN:['nn1','nn2','nn3'],
+     locE:['e-loc-n1','e-loc-n2','e-loc-n3'],sqE:['e-sqft-n1','e-sqft-n2','e-sqft-n3'],otE:[],
+     wts:['wl-loc-n1','wl-loc-n2','wl-loc-n3','wl-sqft-n1','wl-sqft-n2','wl-sqft-n3'],
+     vals:{vn1:'313.5',vn2:'110.6',vn3:'621.4'},panel:'cp1'},
+  2:{locN:['nn1','nn2','nn3'],sqN:[],actN:['nm1','nm2'],locE:[],sqE:[],
+     otE:['e-n1-m1','e-n1-m2','e-n2-m1','e-n2-m2','e-n3-m1','e-n3-m2'],
+     wts:['wl-n1-m1','wl-n1-m2','wl-n2-m1','wl-n2-m2','wl-n3-m1','wl-n3-m2'],
+     vals:{vm1:'332.86',vm2:'210.14'},panel:'cp2'},
+  3:{locN:['nm1','nm2'],sqN:[],actN:['np1','np2','np3'],locE:[],sqE:[],
+     otE:['e-m1-p1','e-m1-p2','e-m1-p3','e-m2-p1','e-m2-p2','e-m2-p3'],
+     wts:['wl-m1-p1','wl-m1-p2','wl-m1-p3','wl-m2-p1','wl-m2-p2','wl-m2-p3'],
+     vals:{vp1:'198.92',vp2:'228.46',vp3:'169.37'},panel:'cp3'},
+  4:{locN:['np1','np2','np3'],sqN:[],actN:['nout'],locE:[],sqE:[],
+     otE:['e-p1-o','e-p2-o','e-p3-o'],
+     wts:['wl-p1-o','wl-p2-o','wl-p3-o'],
+     vals:{vout:'$199k'},panel:'cp4'}
+};
+const ALL_FN=['ni-loc','ni-sqft','nn1','nn2','nn3','nm1','nm2','np1','np2','np3','nout'];
+const ALL_FV=['vn1','vn2','vn3','vm1','vm2','vp1','vp2','vp3','vout'];
+function fwd(step){
+  ALL_FN.forEach(id=>{const el=document.getElementById(id);if(el){el.style.fill='#060610';el.style.stroke='#1a1a35';el.style.filter='';}});
+  document.querySelectorAll('#fsvg line').forEach(l=>{l.setAttribute('stroke','#1a1a35');l.setAttribute('stroke-width','1.3');l.removeAttribute('stroke-dasharray');l.style.animation='';});
+  document.querySelectorAll('#fsvg text[id^="wl-"]').forEach(t=>t.setAttribute('opacity','0'));
+  ALL_FV.forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='?';});
+  document.querySelectorAll('.cpanel').forEach(c=>c.classList.remove('show'));
+  document.querySelectorAll('#s1 .sbtn').forEach((b,i)=>b.classList.toggle('on',i===step));
+  const s=FWD[step];
+  s.locN.forEach(id=>{const el=document.getElementById(id);if(el){el.style.fill='#061408';el.style.stroke='#00d68f';el.style.filter='drop-shadow(0 0 7px #00d68f50)';}});
+  s.sqN.forEach(id=>{const el=document.getElementById(id);if(el){el.style.fill='#051214';el.style.stroke='#00c8d4';el.style.filter='drop-shadow(0 0 7px #00c8d450)';}});
+  s.actN.forEach(id=>{const el=document.getElementById(id);if(el){el.style.fill='#090c20';el.style.stroke='#4f6ef7';el.style.filter='drop-shadow(0 0 7px #4f6ef760)';}});
+  s.locE.forEach(id=>{const el=document.getElementById(id);if(el){el.setAttribute('stroke','#00d68f');el.setAttribute('stroke-width','2');el.setAttribute('stroke-dasharray','6,3');el.style.animation='dash 0.55s linear infinite';}});
+  s.sqE.forEach(id=>{const el=document.getElementById(id);if(el){el.setAttribute('stroke','#00c8d4');el.setAttribute('stroke-width','2');el.setAttribute('stroke-dasharray','6,3');el.style.animation='dash 0.55s linear infinite';}});
+  s.otE.forEach(id=>{const el=document.getElementById(id);if(el){el.setAttribute('stroke','#4f6ef7');el.setAttribute('stroke-width','2');el.setAttribute('stroke-dasharray','6,3');el.style.animation='dash 0.55s linear infinite';}});
+  s.wts.forEach(id=>{const el=document.getElementById(id);if(el)el.setAttribute('opacity','1');});
+  Object.entries(s.vals).forEach(([id,val])=>{const el=document.getElementById(id);if(el)el.textContent=val;});
+  if(s.panel)document.getElementById(s.panel).classList.add('show');
+}
+fwd(0);
+
+// ---- BACKPROP STEPS ----
+function bp(step){
+  document.querySelectorAll('#s3 .sbtn').forEach((b,i)=>b.classList.toggle('on',i===step));
+  document.querySelectorAll('#s3 .cpanel').forEach(c=>c.classList.remove('show'));
+
+  // reset SVG
+  ['be-i-n1','be-i-n2','be-i-n3','be-n1-o','be-n2-o','be-n3-o','be-o-l'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.setAttribute('stroke','#1a1a35');el.setAttribute('stroke-width','1.5');el.removeAttribute('stroke-dasharray');el.style.animation='';}
+  });
+  ['bi','bn1','bn2','bn3','bo'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.style.fill='#060610';el.style.stroke='#1a1a35';el.style.filter='';}
+  });
+  document.getElementById('blbox').style.stroke='#1a1a35';
+  document.getElementById('blval').style.fill='#ff3d6b';
+  document.getElementById('bp-arrow').setAttribute('opacity','0');
+  document.getElementById('bp-label').setAttribute('opacity','0');
+  ['bwf-i-n1','bwf-i-n2','bwf-i-n3','bg-n1','bg-n2','bg-n3','bnw-i-n1','bnw-i-n2','bnw-i-n3'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.setAttribute('opacity','0');
+  });
+
+  if(step===0){
+    // forward green
+    ['be-i-n1','be-i-n2','be-i-n3','be-n1-o','be-n2-o','be-n3-o','be-o-l'].forEach(id=>{
+      const el=document.getElementById(id);if(el){el.setAttribute('stroke','#00d68f');el.setAttribute('stroke-width','2');el.setAttribute('stroke-dasharray','6,3');el.style.animation='dash 0.6s linear infinite';}
+    });
+    ['bi','bn1','bn2','bn3'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.fill='#061408';el.style.stroke='#00d68f';}});
+    document.getElementById('bo').style.fill='#090c20'; document.getElementById('bo').style.stroke='#4f6ef7';
+  }
+  if(step===1){
+    document.getElementById('blbox').style.stroke='#ff3d6b';
+    document.getElementById('bo').style.fill='#090c20'; document.getElementById('bo').style.stroke='#4f6ef7';
+    document.getElementById('be-o-l').setAttribute('stroke','#ff3d6b');
+    document.getElementById('be-o-l').setAttribute('stroke-width','2');
+  }
+  if(step===2){
+    // backprop red arrows
+    ['be-n1-o','be-n2-o','be-n3-o','be-o-l'].forEach(id=>{
+      const el=document.getElementById(id);if(el){el.setAttribute('stroke','#ff3d6b');el.setAttribute('stroke-width','2.5');el.setAttribute('stroke-dasharray','6,3');el.style.animation='dashr 0.6s linear infinite';}
+    });
+    document.getElementById('bp-arrow').setAttribute('opacity','1');
+    document.getElementById('bp-label').setAttribute('opacity','1');
+    document.getElementById('blbox').style.stroke='#ff3d6b';
+    ['bn1','bn2','bn3'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.stroke='#ff3d6b';el.style.filter='drop-shadow(0 0 6px #ff3d6b50)';}});
+  }
+  if(step===3){
+    ['bwf-i-n1','bwf-i-n2','bwf-i-n3','bg-n1','bg-n2','bg-n3'].forEach(id=>{
+      const el=document.getElementById(id);if(el)el.setAttribute('opacity','1');
+    });
+    ['be-i-n1','be-i-n2','be-i-n3'].forEach(id=>{
+      const el=document.getElementById(id);if(el){el.setAttribute('stroke','#ff3d6b');el.setAttribute('stroke-width','2');el.setAttribute('stroke-dasharray','4,3');el.style.animation='dashr 0.7s linear infinite';}
+    });
+    ['bn1','bn2','bn3'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.stroke='#ff3d6b';el.style.filter='drop-shadow(0 0 6px #ff3d6b50)';}});
+  }
+  if(step===4){
+    ['bnw-i-n1','bnw-i-n2','bnw-i-n3'].forEach(id=>{
+      const el=document.getElementById(id);if(el)el.setAttribute('opacity','1');
+    });
+    ['be-i-n1','be-i-n2','be-i-n3'].forEach(id=>{
+      const el=document.getElementById(id);if(el){el.setAttribute('stroke','#00d68f');el.setAttribute('stroke-width','2.5');el.removeAttribute('stroke-dasharray');el.style.animation='';}
+    });
+    ['bn1','bn2','bn3'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.fill='#061408';el.style.stroke='#00d68f';el.style.filter='drop-shadow(0 0 6px #00d68f50)';}});
+  }
+  if(step===5){
+    document.getElementById('bvo').textContent='248';
+    document.getElementById('bvo').style.fill='#00d68f';
+    document.getElementById('blval').textContent='2,304';
+    document.getElementById('blval').style.fill='#ffc947';
+    ['be-i-n1','be-i-n2','be-i-n3','be-n1-o','be-n2-o','be-n3-o','be-o-l'].forEach(id=>{
+      const el=document.getElementById(id);if(el){el.setAttribute('stroke','#00d68f');el.setAttribute('stroke-width','2');el.setAttribute('stroke-dasharray','6,3');el.style.animation='dash 0.6s linear infinite';}
+    });
+    ['bi','bn1','bn2','bn3'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.fill='#061408';el.style.stroke='#00d68f';}});
+  }
+
+  const panelId='bp'+step;
+  const panel=document.getElementById(panelId);
+  if(panel)panel.classList.add('show');
+}
+bp(0);
+
+// ---- VANISHING GRADIENT ----
+const VG_DATA = [
+  {bar:0, h:120, color:'#00d68f', val:'700', label:'Output gradient = 700'},
+  {bar:1, h:80,  color:'#00d68f', val:'70',  label:'Layer 3: 700×0.1 = 70'},
+  {bar:2, h:30,  color:'#ffc947', val:'7',   label:'Layer 2: 70×0.1 = 7'},
+  {bar:3, h:5,   color:'#ff3d6b', val:'0.7', label:'Layer 1: 7×0.1 = 0.7 ← DEAD'}
+];
+function vg(step){
+  document.querySelectorAll('#s5 .sbtn').forEach((b,i)=>b.classList.toggle('on',i===step));
+  document.querySelectorAll('#s5 .cpanel').forEach(c=>c.classList.remove('show'));
+  // reset bars
+  for(let i=0;i<4;i++){
+    const bar=document.getElementById('vgbar'+i);
+    if(bar){bar.setAttribute('height','0');bar.setAttribute('y','160');bar.setAttribute('fill','#00d68f');}
+    const val=document.getElementById('vgval'+i);
+    if(val){val.textContent='?';val.style.fill='#ffc947';}
+    const arr=document.getElementById('vga'+(i+1));
+    if(arr){arr.setAttribute('stroke','#1a1a35');}
+  }
+  document.getElementById('vgdead').setAttribute('opacity','0');
+  document.getElementById('vglearn').setAttribute('opacity','0');
+
+  // show bars up to current step
+  for(let i=0;i<=step&&i<4;i++){
+    const d=VG_DATA[i];
+    const bar=document.getElementById('vgbar'+i);
+    if(bar){bar.setAttribute('height',d.h);bar.setAttribute('y',160-d.h);bar.setAttribute('fill',d.color);}
+    const val=document.getElementById('vgval'+i);
+    if(val){val.textContent=d.val;val.style.fill=d.color;}
+    // activate arrow
+    const arr=document.getElementById('vga'+i);
+    if(arr)arr.setAttribute('stroke',i<2?'#ffc947':'#ff3d6b');
+  }
+  if(step===4||step===3){
+    document.getElementById('vgdead').setAttribute('opacity','1');
+    document.getElementById('vglearn').setAttribute('opacity','1');
+  }
+  const panel=document.getElementById('vgp'+Math.min(step,4));
+  if(panel)panel.classList.add('show');
+}
+vg(0);
+
+// ---- RELU ----
+function relu(step){
+  document.querySelectorAll('#s6 .sbtn').forEach((b,i)=>b.classList.toggle('on',i===step));
+  document.querySelectorAll('#s6 .cpanel').forEach(c=>c.classList.remove('show'));
+
+  // reset
+  ['rn1','rn2','rn3','ro1','ro2','ro3'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.style.fill='#060610';el.style.stroke='#1a1a35';el.style.filter='';}
+  });
+  ['rg1','rg2','rg3'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.style.stroke='#1a1a35';el.removeAttribute('stroke-dasharray');el.style.animation='';}
+  });
+  ['rb1','rb2','rb3'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.setAttribute('stroke','#1a1a35');el.removeAttribute('stroke-dasharray');el.style.animation='';}
+  });
+  ['rgv1','rgv2','rgv3'].forEach((id,i)=>{
+    const el=document.getElementById(id);
+    if(el){el.textContent=['max(0, 313.5)','max(0, 110.6)','max(0, −85.0)'][i];el.style.fill='#ffc947';}
+  });
+  ['rov1','rov2','rov3'].forEach(id=>{const el=document.getElementById(id);if(el){el.textContent='?';el.style.fill='#ffc947';}});
+  document.getElementById('rcross').setAttribute('opacity','0');
+  document.getElementById('rkilled').setAttribute('opacity','0');
+  document.getElementById('rpassed').setAttribute('opacity','0');
+  document.getElementById('rpassed2').setAttribute('opacity','0');
+  ['rg1','rg2','rg3'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.stroke='#1a1a35';el.removeAttribute('stroke-dasharray');el.style.animation='';}});
+
+  if(step===0){
+    ['rn1','rn2'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.fill='#061408';el.style.stroke='#00d68f';}});
+    document.getElementById('rn3').style.fill='#1a0610';
+    document.getElementById('rn3').style.stroke='#ff3d6b';
+  }
+  if(step===1){
+    // gates light up
+    document.getElementById('rg1').style.stroke='#00d68f';
+    document.getElementById('rg2').style.stroke='#00d68f';
+    document.getElementById('rg3').style.stroke='#ff3d6b';
+    document.getElementById('rgv1').textContent='313.5 → PASS';document.getElementById('rgv1').style.fill='#00d68f';
+    document.getElementById('rgv2').textContent='110.6 → PASS';document.getElementById('rgv2').style.fill='#00d68f';
+    document.getElementById('rgv3').textContent='-85 → KILL=0';document.getElementById('rgv3').style.fill='#ff3d6b';
+    ['ra1','ra2'].forEach(id=>{const el=document.getElementById(id);if(el){el.setAttribute('stroke','#00d68f');el.setAttribute('stroke-dasharray','5,3');el.style.animation='dash 0.6s linear infinite';}});
+    document.getElementById('ra3').setAttribute('stroke','#ff3d6b');
+    document.getElementById('ra3').setAttribute('stroke-dasharray','5,3');
+    document.getElementById('ra3').style.animation='dash 0.6s linear infinite';
+  }
+  if(step===2){
+    document.getElementById('rov1').textContent='313.5';document.getElementById('rov1').style.fill='#00d68f';
+    document.getElementById('rov2').textContent='110.6';document.getElementById('rov2').style.fill='#00d68f';
+    document.getElementById('rov3').textContent='0';document.getElementById('rov3').style.fill='#ff3d6b';
+    document.getElementById('ro1').style.fill='#061408';document.getElementById('ro1').style.stroke='#00d68f';document.getElementById('ro1').style.filter='drop-shadow(0 0 6px #00d68f50)';
+    document.getElementById('ro2').style.fill='#061408';document.getElementById('ro2').style.stroke='#00d68f';document.getElementById('ro2').style.filter='drop-shadow(0 0 6px #00d68f50)';
+    document.getElementById('ro3').style.fill='#1a0610';document.getElementById('ro3').style.stroke='#ff3d6b';
+    document.getElementById('rcross').setAttribute('opacity','1');
+    document.getElementById('rkilled').setAttribute('opacity','1');
+    document.getElementById('rpassed').setAttribute('opacity','1');
+    document.getElementById('rpassed2').setAttribute('opacity','1');
+    ['rb1','rb2'].forEach(id=>{const el=document.getElementById(id);if(el){el.setAttribute('stroke','#00d68f');el.setAttribute('stroke-dasharray','5,3');el.style.animation='dash 0.6s linear infinite';}});
+    document.getElementById('rb3').setAttribute('stroke','#333');
+  }
+  if(step===3){
+    document.getElementById('rov1').textContent='313.5';document.getElementById('rov1').style.fill='#00d68f';
+    document.getElementById('rov2').textContent='110.6';document.getElementById('rov2').style.fill='#00d68f';
+    document.getElementById('rov3').textContent='0';document.getElementById('rov3').style.fill='#ff3d6b';
+    document.getElementById('ro1').style.fill='#061408';document.getElementById('ro1').style.stroke='#00d68f';
+    document.getElementById('ro2').style.fill='#061408';document.getElementById('ro2').style.stroke='#00d68f';
+  }
+  document.getElementById('rp'+step).classList.add('show');
+}
+relu(0);
+
+// ---- SOFTMAX ----
+function smx(step){
+  document.querySelectorAll('#s7 .sbtn').forEach((b,i)=>b.classList.toggle('on',i===step));
+  document.querySelectorAll('#s7 .cpanel').forEach(c=>c.classList.remove('show'));
+  // reset
+  ['sc1','sc2','sc3'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.fill='#060610';el.style.stroke='#1a1a35';}});
+  ['sa1','sa2','sa3','sb1','sb2','sb3'].forEach(id=>{const el=document.getElementById(id);if(el){el.setAttribute('stroke','#1a1a35');el.removeAttribute('stroke-dasharray');el.style.animation='';}});
+  document.getElementById('smbox').style.stroke='#1a1a35';
+  document.getElementById('smtotal').setAttribute('opacity','0');
+  document.getElementById('pbar1').setAttribute('width','0');
+  document.getElementById('pbar2').setAttribute('width','0');
+  document.getElementById('pbar3').setAttribute('width','0');
+  ['pval1','pval2','pval3','swinner'].forEach(id=>{document.getElementById(id).setAttribute('opacity','0');});
+
+  if(step===0){
+    ['sc1','sc2','sc3'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.fill='#0c0c1a';el.style.stroke='#4f6ef7';}});
+  }
+  if(step===1){
+    ['sa1','sa2','sa3'].forEach(id=>{const el=document.getElementById(id);if(el){el.setAttribute('stroke','#ffc947');el.setAttribute('stroke-dasharray','5,3');el.style.animation='dash 0.6s linear infinite';}});
+    document.getElementById('smbox').style.stroke='#b47bff';
+    ['sc1','sc2','sc3'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.fill='#0c0c1a';el.style.stroke='#4f6ef7';}});
+  }
+  if(step===2){
+    document.getElementById('smtotal').setAttribute('opacity','1');
+    ['sb1','sb2','sb3'].forEach((id,i)=>{const el=document.getElementById(id);if(el){el.setAttribute('stroke',['#00d68f','#ffc947','#00c8d4'][i]);el.setAttribute('stroke-dasharray','5,3');el.style.animation='dash 0.5s linear infinite';}});
+    document.getElementById('pbar1').setAttribute('width','151'); // 84%
+    document.getElementById('pbar2').setAttribute('width','23');  // 13%
+    document.getElementById('pbar3').setAttribute('width','5');   // 3%
+    ['pval1','pval2','pval3'].forEach(id=>document.getElementById(id).setAttribute('opacity','1'));
+    document.getElementById('swinner').setAttribute('opacity','1');
+    document.getElementById('smbox').style.stroke='#b47bff';
+  }
+  if(step===3){
+    document.getElementById('pbar1').setAttribute('width','151');
+    document.getElementById('pbar2').setAttribute('width','23');
+    document.getElementById('pbar3').setAttribute('width','5');
+    ['pval1','pval2','pval3','swinner'].forEach(id=>document.getElementById(id).setAttribute('opacity','1'));
+    document.getElementById('smtotal').setAttribute('opacity','1');
+  }
+  document.getElementById('sp'+step).classList.add('show');
+}
+smx(0);
+
+// ---- BATCH NORM ----
+function bn(step){
+  document.querySelectorAll('#s8 .sbtn').forEach((b,i)=>b.classList.toggle('on',i===step));
+  document.querySelectorAll('#s8 .cpanel').forEach(c=>c.classList.remove('show'));
+  // reset before bars
+  document.getElementById('bnb1').setAttribute('height','0');document.getElementById('bnb1').setAttribute('y','155');
+  document.getElementById('bnb2').setAttribute('height','0');document.getElementById('bnb2').setAttribute('y','155');
+  document.getElementById('bnb3').setAttribute('height','0');document.getElementById('bnb3').setAttribute('y','155');
+  // reset after bars
+  document.getElementById('bna1').setAttribute('height','0');document.getElementById('bna1').setAttribute('y','155');
+  document.getElementById('bna2').setAttribute('height','0');document.getElementById('bna2').setAttribute('y','155');
+  document.getElementById('bna3').setAttribute('height','0');document.getElementById('bna3').setAttribute('y','155');
+  document.getElementById('bn-center').setAttribute('opacity','0');
+  document.getElementById('bn-center-label').setAttribute('opacity','0');
+
+  if(step>=0){
+    // show wild before bars
+    document.getElementById('bnb1').setAttribute('height','110');document.getElementById('bnb1').setAttribute('y','45');
+    document.getElementById('bnb2').setAttribute('height','2');  document.getElementById('bnb2').setAttribute('y','153');
+    document.getElementById('bnb3').setAttribute('height','30'); document.getElementById('bnb3').setAttribute('y','125');
+  }
+  if(step>=2){
+    // show normalized after bars
+    document.getElementById('bna1').setAttribute('height','28');document.getElementById('bna1').setAttribute('y','127');document.getElementById('bna1').setAttribute('fill','#00d68f');
+    document.getElementById('bna2').setAttribute('height','18');document.getElementById('bna2').setAttribute('y','137');document.getElementById('bna2').setAttribute('fill','#4f6ef7');
+    document.getElementById('bna3').setAttribute('height','22');document.getElementById('bna3').setAttribute('y','133');document.getElementById('bna3').setAttribute('fill','#00c8d4');
+  }
+  if(step>=3){
+    document.getElementById('bn-center').setAttribute('opacity','1');
+    document.getElementById('bn-center-label').setAttribute('opacity','1');
+  }
+  document.getElementById('bnp'+step).classList.add('show');
+}
+bn(0);
+
+// ---- RESIDUAL ----
+function res(step){
+  document.querySelectorAll('#s9 .sbtn').forEach((b,i)=>b.classList.toggle('on',i===step));
+  document.querySelectorAll('#s9 .cpanel').forEach(c=>c.classList.remove('show'));
+  // reset
+  ['rl1','rl2','rl3'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.fill='#0c0c1a';el.style.stroke='#1a1a35';}});
+  ['rn-a1','rn-a2'].forEach(id=>{const el=document.getElementById(id);if(el){el.setAttribute('stroke','#1a1a35');el.removeAttribute('stroke-dasharray');el.style.animation='';}});
+  document.getElementById('skip-path').setAttribute('opacity','0');
+  document.getElementById('skip-label').setAttribute('opacity','0');
+  document.getElementById('rcombined').setAttribute('opacity','0');
+  ['rg1','rg2','rg3'].forEach(id=>{const el=document.getElementById(id);if(el)el.setAttribute('opacity','0');});
+  ['rnorm-box','rnorm-txt1','rnorm-txt2','rskip-box','rskip-txt1','rskip-txt2'].forEach(id=>{const el=document.getElementById(id);if(el)el.setAttribute('opacity','0');});
+
+  if(step===0){
+    ['rl3','rl2','rl1'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.fill='#090c20';el.style.stroke='#4f6ef7';}});
+    ['rn-a1','rn-a2'].forEach(id=>{const el=document.getElementById(id);if(el){el.setAttribute('stroke','#ff3d6b');el.setAttribute('stroke-dasharray','6,3');el.style.animation='dashr 0.7s linear infinite';}});
+    document.getElementById('rg3').setAttribute('opacity','1');
+  }
+  if(step===1){
+    ['rl3','rl2','rl1'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.fill='#090c20';el.style.stroke='#4f6ef7';}});
+    ['rn-a1','rn-a2'].forEach(id=>{const el=document.getElementById(id);if(el){el.setAttribute('stroke','#ff3d6b');el.setAttribute('stroke-dasharray','6,3');el.style.animation='dashr 0.7s linear infinite';}});
+    ['rg1','rg2','rg3'].forEach(id=>{const el=document.getElementById(id);if(el)el.setAttribute('opacity','1');});
+    document.getElementById('rl1').style.stroke='#ff3d6b';
+    ['rnorm-box','rnorm-txt1','rnorm-txt2'].forEach(id=>{document.getElementById(id).setAttribute('opacity','1');});
+  }
+  if(step===2){
+    ['rl3','rl2','rl1'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.fill='#090c20';el.style.stroke='#4f6ef7';}});
+    document.getElementById('skip-path').setAttribute('opacity','1');
+    document.getElementById('skip-label').setAttribute('opacity','1');
+    document.getElementById('rl1').style.stroke='#ffc947';
+    document.getElementById('rl1').style.filter='drop-shadow(0 0 6px #ffc94750)';
+  }
+  if(step===3){
+    ['rl3','rl2','rl1'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.fill='#090c20';el.style.stroke='#4f6ef7';}});
+    document.getElementById('skip-path').setAttribute('opacity','1');
+    document.getElementById('skip-label').setAttribute('opacity','1');
+    ['rn-a1','rn-a2'].forEach(id=>{const el=document.getElementById(id);if(el){el.setAttribute('stroke','#ff3d6b');el.setAttribute('stroke-dasharray','6,3');el.style.animation='dashr 0.7s linear infinite';}});
+    document.getElementById('rcombined').setAttribute('opacity','1');
+    document.getElementById('rl1').style.fill='#061408';
+    document.getElementById('rl1').style.stroke='#00d68f';
+    document.getElementById('rl1').style.filter='drop-shadow(0 0 8px #00d68f80)';
+    ['rg1','rg2','rg3'].forEach(id=>{const el=document.getElementById(id);if(el)el.setAttribute('opacity','1');});
+    ['rnorm-box','rnorm-txt1','rnorm-txt2','rskip-box','rskip-txt1','rskip-txt2'].forEach(id=>{document.getElementById(id).setAttribute('opacity','1');});
+  }
+  document.getElementById('resp'+step).classList.add('show');
+}
+res(0);
+</script>
+<style>
+@keyframes dash{to{stroke-dashoffset:-18;}}
+@keyframes dashr{to{stroke-dashoffset:18;}}
+</style>
+</body>
+</html>
