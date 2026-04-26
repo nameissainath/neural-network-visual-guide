@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ML Interview Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --card: #12121a;
+    --border: #1e1e2e;
+    --accent1: #00f5d4;
+    --accent2: #f72585;
+    --accent3: #7209b7;
+    --accent4: #ffd60a;
+    --accent5: #4cc9f0;
+    --text: #e2e2f0;
+    --muted: #6b6b8a;
+    --code: #1a1a2e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* Header */
+  .hero {
+    text-align: center;
+    padding: 60px 20px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -100px; left: 50%;
+    transform: translateX(-50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(114,9,183,0.3) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    background: linear-gradient(135deg, var(--accent1), var(--accent5), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+  }
+  .hero p {
+    color: var(--muted);
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* Nav */
+  .nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    position: sticky;
+    top: 0;
+    background: rgba(10,10,15,0.95);
+    backdrop-filter: blur(10px);
+    z-index: 100;
+    border-bottom: 1px solid var(--border);
+  }
+  .nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    transition: all 0.2s;
+  }
+  .nav a:hover {
+    color: var(--accent1);
+    border-color: var(--accent1);
+  }
+
+  /* Sections */
+  .section {
+    max-width: 900px;
+    margin: 0 auto 60px;
+    padding: 0 20px;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .section-title .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    color: var(--accent1);
+    border: 1px solid var(--accent1);
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--accent-line, var(--accent1));
+  }
+  .card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 14px;
+    color: var(--accent1);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Code blocks */
+  .code {
+    background: var(--code);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.8;
+    white-space: pre;
+    overflow-x: auto;
+    margin: 12px 0;
+    color: #c9d1d9;
+  }
+  .code .g { color: var(--accent1); }
+  .code .p { color: var(--accent2); }
+  .code .y { color: var(--accent4); }
+  .code .b { color: var(--accent5); }
+  .code .m { color: #bd93f9; }
+
+  /* Diagrams */
+  .diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 20px 0;
+    padding: 20px;
+    background: var(--code);
+    border-radius: 12px;
+  }
+  .box {
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-align: center;
+    min-width: 100px;
+  }
+  .box.green { background: rgba(0,245,212,0.15); border: 1px solid var(--accent1); color: var(--accent1); }
+  .box.pink { background: rgba(247,37,133,0.15); border: 1px solid var(--accent2); color: var(--accent2); }
+  .box.purple { background: rgba(114,9,183,0.3); border: 1px solid var(--accent3); color: #bd93f9; }
+  .box.yellow { background: rgba(255,214,10,0.15); border: 1px solid var(--accent4); color: var(--accent4); }
+  .box.blue { background: rgba(76,201,240,0.15); border: 1px solid var(--accent5); color: var(--accent5); }
+  .arrow { color: var(--muted); font-size: 1.2rem; }
+
+  /* Table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    margin: 16px 0;
+  }
+  th {
+    background: var(--border);
+    padding: 10px 14px;
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--accent1);
+  }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* Tags */
+  .tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    margin: 3px;
+  }
+  .tag.g { background: rgba(0,245,212,0.15); color: var(--accent1); }
+  .tag.p { background: rgba(247,37,133,0.15); color: var(--accent2); }
+  .tag.y { background: rgba(255,214,10,0.15); color: var(--accent4); }
+  .tag.b { background: rgba(76,201,240,0.15); color: var(--accent5); }
+
+  /* Interview box */
+  .interview {
+    background: rgba(0,245,212,0.05);
+    border: 1px solid rgba(0,245,212,0.3);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 16px;
+  }
+  .interview h4 {
+    color: var(--accent1);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    margin-bottom: 10px;
+  }
+  .interview p, .interview li {
+    color: #b0b0c8;
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+
+  /* Grid */
+  .grid2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin: 16px 0;
+  }
+
+  /* Neuron diagram */
+  .neuron-diagram {
+    text-align: center;
+    padding: 20px;
+    background: var(--code);
+    border-radius: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    line-height: 2;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
+  }
+
+  /* Big hierarchy */
+  .tree {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    line-height: 2;
+    padding: 20px;
+    background: var(--code);
+    border-radius: 12px;
+  }
+  .tree .l1 { color: var(--accent1); }
+  .tree .l2 { color: var(--accent5); }
+  .tree .l3 { color: var(--accent4); }
+  .tree .l4 { color: var(--accent2); }
+  .tree .l5 { color: #bd93f9; }
+
+  .highlight { color: var(--accent4); font-weight: 700; }
+
+  /* Softmax visual */
+  .bar-wrap { margin: 8px 0; }
+  .bar-label { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--muted); margin-bottom: 4px; }
+  .bar-outer { background: var(--border); border-radius: 4px; height: 24px; overflow: hidden; }
+  .bar-inner { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 10px; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 700; transition: width 1s ease; }
+
+  /* Transformer block */
+  .tf-block {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 16px 0;
+  }
+  .tf-row {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    gap: 14px;
+  }
+  .tf-row:last-child { border-bottom: none; }
+  .tf-icon { font-size: 1.2rem; width: 30px; }
+  .tf-name { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--accent1); width: 200px; }
+  .tf-desc { font-size: 0.85rem; color: var(--muted); }
+
+  footer {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>ML & Deep Learning<br>Interview Guide</h1>
+  <p>From Linear Regression to Transformers — with examples, diagrams & interview answers</p>
+</div>
+
+<nav class="nav">
+  <a href="#bigpicture">Big Picture</a>
+  <a href="#linear">Linear Regression</a>
+  <a href="#logistic">Logistic Regression</a>
+  <a href="#activations">Activations</a>
+  <a href="#ann">ANN</a>
+  <a href="#backprop">Backprop</a>
+  <a href="#cnn">CNN</a>
+  <a href="#rnn">RNN & LSTM</a>
+  <a href="#transformer">Transformer</a>
+  <a href="#norm">Normalisation</a>
+</nav>
+
+<!-- BIG PICTURE -->
+<div class="section" id="bigpicture" style="margin-top:40px">
+  <div class="section-title"><span class="num">00</span> The Big Picture</div>
+  <div class="card">
+    <div class="tree">
+<span class="l1">🤖 Artificial Intelligence</span>
+└── <span class="l2">📊 Machine Learning</span>
+    ├── <span class="l3">📈 Linear Regression</span>       → predict a NUMBER
+    ├── <span class="l3">✅ Logistic Regression</span>     → predict YES/NO
+    └── <span class="l2">🧠 Deep Learning (Neural Networks)</span>
+        ├── <span class="l4">🔢 ANN</span>  → complex numerical data
+        ├── <span class="l4">🖼️  CNN</span>  → images & visual data
+        ├── <span class="l4">📝 RNN</span>  → sequences (short memory)
+        ├── <span class="l4">💾 LSTM</span> → sequences (long memory)
+        └── <span class="l5">⚡ Transformer</span> → everything! (ChatGPT, Claude)
+    </div>
+    <div class="interview" style="margin-top:16px">
+      <h4>💼 Interview one-liner:</h4>
+      <p>Linear & Logistic Regression are simple math equations with no neural network. Deep Learning models use layers of neurons to learn complex patterns — ANN for numbers, CNN for images, RNN/LSTM for sequences, and Transformers for everything at scale.</p>
+    </div>
+  </div>
+</div>
+
+<!-- LINEAR REGRESSION -->
+<div class="section" id="linear">
+  <div class="section-title"><span class="num">01</span> Linear Regression</div>
+  <div class="card" style="--accent-line: #4cc9f0">
+    <h3>📈 What is it?</h3>
+    <p style="color:var(--muted); margin-bottom:14px">Predicts a <strong style="color:var(--accent4)">continuous number</strong> using a straight line equation. No neural network!</p>
+    <div class="code"><span class="g">Formula:</span>  Output = w1×x1 + w2×x2 + bias
+
+<span class="y">Example:</span>  Predict House Price 🏠
+  Input:   Size=1000sqft, Rooms=3
+  Output:  $200,000
+
+<span class="b">Equation:</span> Price = w1×(Size) + w2×(Rooms) + bias
+          Price = 150×1000 + 10000×3 + 20000
+          Price = $200,000 ✅</div>
+    <div class="diagram">
+      <div class="box blue">Size<br>Rooms</div>
+      <span class="arrow">→</span>
+      <div class="box green">Linear<br>Equation</div>
+      <span class="arrow">→</span>
+      <div class="box yellow">$200,000<br>(number)</div>
+    </div>
+    <div class="interview">
+      <h4>💼 Interview answer:</h4>
+      <p>Linear Regression finds the best-fit straight line through data points. Output is always a continuous number. It uses Ordinary Least Squares to minimize the difference between predicted and actual values. Used when relationship between input and output is approximately linear.</p>
+    </div>
+  </div>
+</div>
+
+<!-- LOGISTIC REGRESSION -->
+<div class="section" id="logistic">
+  <div class="section-title"><span class="num">02</span> Logistic Regression</div>
+  <div class="card" style="--accent-line: #f72585">
+    <h3>✅ What is it?</h3>
+    <p style="color:var(--muted); margin-bottom:14px">Predicts a <strong style="color:var(--accent4)">category (Yes/No)</strong>. Uses Sigmoid to squish output between 0 and 1.</p>
+    <div class="code"><span class="g">Formula:</span>  Output = Sigmoid(w1×x1 + w2×x2 + bias)
+
+<span class="y">Example:</span>  Pass or Fail? 🎓
+  Input:   Study hours=7, Sleep=8
+  Linear:  z = 0.5×7 + 0.3×8 = 5.9
+  Sigmoid: σ(5.9) = 0.997 → 99.7% → <span class="g">PASS ✅</span>
+
+  Input:   Study hours=1, Sleep=3
+  Linear:  z = 0.5×1 + 0.3×3 = 1.4
+  Sigmoid: σ(1.4) = 0.80... wait
+           with negative bias → 0.05 → <span class="p">FAIL ❌</span></div>
+    <div class="diagram">
+      <div class="box blue">Study hrs<br>Sleep hrs</div>
+      <span class="arrow">→</span>
+      <div class="box green">Linear<br>Equation</div>
+      <span class="arrow">→</span>
+      <div class="box purple">Sigmoid<br>0→1</div>
+      <span class="arrow">→</span>
+      <div class="box pink">Pass/Fail<br>(class)</div>
+    </div>
+    <table>
+      <tr><th>Feature</th><th>Linear Regression</th><th>Logistic Regression</th></tr>
+      <tr><td>Output</td><td>Number ($200k)</td><td>Class (Pass/Fail)</td></tr>
+      <tr><td>Activation</td><td>None</td><td>Sigmoid</td></tr>
+      <tr><td>Neural Network?</td><td>❌ No</td><td>❌ No</td></tr>
+      <tr><td>Features</td><td>Any number</td><td>Any number</td></tr>
+    </table>
+    <div class="interview">
+      <h4>💼 Key insight for interview:</h4>
+      <p>The number of features does NOT decide which regression to use. The <strong style="color:var(--accent4)">output type</strong> decides! Number output → Linear. Category output → Logistic.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ACTIVATION FUNCTIONS -->
+<div class="section" id="activations">
+  <div class="section-title"><span class="num">03</span> Activation Functions</div>
+  <div class="grid2">
+    <!-- Sigmoid -->
+    <div class="card" style="--accent-line: #4cc9f0">
+      <h3>σ Sigmoid</h3>
+      <div class="code">Formula: 1 / (1 + e^(-x))
+Range:   0 → 1
+
+<span class="g">Input:  2  → 0.88 (88%)</span>
+<span class="p">Input: -3  → 0.05 (5%)</span>
+Input:  0  → 0.50 (50%)
+
+<span class="y">Use: Output layer for Yes/No</span></div>
+    </div>
+    <!-- ReLU -->
+    <div class="card" style="--accent-line: #f72585">
+      <h3>⚡ ReLU</h3>
+      <div class="code">Formula: max(0, x)
+Range:   0 → ∞
+
+<span class="g">Input:  3  →  3  (keep)</span>
+<span class="p">Input: -5  →  0  (kill)</span>
+<span class="g">Input:  7  →  7  (keep)</span>
+
+<span class="y">Use: Hidden layers in ANN/CNN</span></div>
+    </div>
+    <!-- Softmax -->
+    <div class="card" style="--accent-line: #ffd60a; grid-column: 1/-1">
+      <h3>🎯 Softmax — Multi-class Example 🍎🍌🍇</h3>
+      <div class="code"><span class="b">Raw scores:</span>  Apple=2,  Banana=1,  Grape=0.5
+
+<span class="b">Step 1 - e^ each:</span>
+  e^2.0 = 7.39  🍎
+  e^1.0 = 2.72  🍌
+  e^0.5 = 1.65  🍇
+  <span class="y">Sum  = 11.76</span>
+
+<span class="b">Step 2 - divide by sum:</span>
+  Apple:  7.39/11.76 = <span class="g">59% 🍎 ← Winner!</span>
+  Banana: 2.72/11.76 = <span class="m">27% 🍌</span>
+  Grape:  1.65/11.76 = <span class="p">14% 🍇</span>
+  <span class="y">Total = 100% ✅</span></div>
+      <div style="margin-top:14px">
+        <div class="bar-wrap"><div class="bar-label">🍎 Apple</div><div class="bar-outer"><div class="bar-inner" style="width:59%;background:linear-gradient(90deg,#00f5d4,#4cc9f0)">59%</div></div></div>
+        <div class="bar-wrap"><div class="bar-label">🍌 Banana</div><div class="bar-outer"><div class="bar-inner" style="width:27%;background:linear-gradient(90deg,#bd93f9,#7209b7)">27%</div></div></div>
+        <div class="bar-wrap"><div class="bar-label">🍇 Grape</div><div class="bar-outer"><div class="bar-inner" style="width:14%;background:linear-gradient(90deg,#f72585,#c77dff)">14%</div></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <table>
+      <tr><th>Function</th><th>Range</th><th>Where Used</th><th>Example</th></tr>
+      <tr><td>Sigmoid</td><td>0 → 1</td><td>Output (binary)</td><td>Pass/Fail</td></tr>
+      <tr><td>ReLU</td><td>0 → ∞</td><td>Hidden layers</td><td>Image features</td></tr>
+      <tr><td>Softmax</td><td>0→1 (sums=1)</td><td>Output (multi-class)</td><td>Apple/Banana/Grape</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ANN -->
+<div class="section" id="ann">
+  <div class="section-title"><span class="num">04</span> ANN — Artificial Neural Network</div>
+  <div class="card">
+    <h3>🧠 Structure</h3>
+    <div class="neuron-diagram">
+<span style="color:var(--accent5)">INPUT LAYER</span>          <span style="color:var(--accent3)">HIDDEN LAYER 1</span>    <span style="color:var(--accent3)">HIDDEN LAYER 2</span>   <span style="color:var(--accent2)">OUTPUT</span>
+
+Age ──────────────┐
+                  ├──→ [N1] ──┐
+Experience ───────┤           ├──→ [N4] ──┐
+                  ├──→ [N2] ──┤           ├──→ $75,000
+Education ────────┤           ├──→ [N5] ──┘
+                  └──→ [N3] ──┘
+
+Each connection has a WEIGHT (learned during training!)
+Each neuron applies: <span style="color:var(--accent4)">output = ReLU(w1×in1 + w2×in2 + bias)</span>
+    </div>
+    <div class="interview" style="margin-top:16px">
+      <h4>💼 Why ANN > Linear Regression for salary?</h4>
+      <p>Linear Regression assumes salary grows in a straight, predictable way. ANN finds hidden non-linear relationships — e.g., Young (25) + High Experience (8yrs) = $90k, but Old (50) + Same Experience = $60k. A straight line can't capture this. ANN's hidden layers and activation functions model these complex curves.</p>
+    </div>
+  </div>
+  <div class="card" style="--accent-line: #ffd60a">
+    <h3>🏋️ How ANN Learns — The Training Loop</h3>
+    <div class="diagram" style="flex-direction:column; align-items:flex-start; gap:6px">
+      <div style="display:flex;align-items:center;gap:10px"><div class="box green" style="min-width:180px">1. Forward Pass</div><span style="color:var(--muted);font-size:0.85rem">Input → layers → prediction</span></div>
+      <div style="padding-left:20px;color:var(--muted);font-size:0.8rem">↓</div>
+      <div style="display:flex;align-items:center;gap:10px"><div class="box pink" style="min-width:180px">2. Calculate Loss</div><span style="color:var(--muted);font-size:0.85rem">How wrong was prediction?</span></div>
+      <div style="padding-left:20px;color:var(--muted);font-size:0.8rem">↓</div>
+      <div style="display:flex;align-items:center;gap:10px"><div class="box yellow" style="min-width:180px">3. Backward Pass</div><span style="color:var(--muted);font-size:0.85rem">Blame each weight (gradient)</span></div>
+      <div style="padding-left:20px;color:var(--muted);font-size:0.8rem">↓</div>
+      <div style="display:flex;align-items:center;gap:10px"><div class="box blue" style="min-width:180px">4. Update Weights</div><span style="color:var(--muted);font-size:0.85rem">w = w - lr × gradient</span></div>
+      <div style="padding-left:20px;color:var(--muted);font-size:0.8rem">↓ repeat thousands of times</div>
+    </div>
+  </div>
+</div>
+
+<!-- BACKPROPAGATION -->
+<div class="section" id="backprop">
+  <div class="section-title"><span class="num">05</span> Forward & Backward Pass</div>
+  <div class="grid2">
+    <div class="card" style="--accent-line: #00f5d4">
+      <h3>➡️ Forward Pass</h3>
+      <div class="code"><span class="g">Data flows INPUT → OUTPUT</span>
+
+Input: [Age=25, Exp=5, Edu=16]
+  ↓
+Hidden Layer 1:
+  N1 = ReLU(w×25 + w×5 + b) = 0.7
+  N2 = ReLU(w×25 + w×5 + b) = 0.4
+  ↓
+Hidden Layer 2:
+  N3 = ReLU(w×0.7 + w×0.4) = 0.6
+  ↓
+Output:
+  Salary = 0.6 × w + bias
+         = $72,000
+
+<span class="y">Actual Salary = $75,000</span>
+<span class="p">Loss = (75000-72000)² = 9,000,000</span></div>
+    </div>
+    <div class="card" style="--accent-line: #f72585">
+      <h3>⬅️ Backward Pass (Backprop)</h3>
+      <div class="code"><span class="p">Error flows OUTPUT → INPUT</span>
+
+Loss = 9,000,000
+
+<span class="b">Step 1:</span> How much did output
+        weight cause this error?
+        → Calculate gradient
+
+<span class="b">Step 2:</span> How much did Layer2
+        weights cause this error?
+        → Chain rule!
+
+<span class="b">Step 3:</span> How much did Layer1
+        weights cause this error?
+        → Chain rule again!
+
+<span class="b">Update:</span> w = w - 0.01 × gradient
+        (0.01 = learning rate)
+
+<span class="g">Repeat → Loss gets smaller! ✅</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>🔗 Chain Rule Simply</h3>
+    <div class="code"><span class="y">Think of it like blaming in a team:</span>
+
+Goal scored ← Striker ← Midfielder ← Defender
+
+If goal missed:
+  Blame Striker:   80% responsible
+  Blame Midfielder: 15% responsible
+  Blame Defender:   5% responsible
+
+Each gets "blame" = gradient
+Each adjusts their play = weight update
+
+<span class="g">That is backpropagation! 🎯</span></div>
+    <div class="interview" style="margin-top:14px">
+      <h4>💼 Interview answer:</h4>
+      <p>Backpropagation uses the chain rule of calculus to compute gradients of the loss with respect to each weight. Starting from the output layer, it propagates the error backward, calculating how much each weight contributed to the error. Weights are then updated using gradient descent: w = w - lr × gradient.</p>
+    </div>
+  </div>
+</div>
+
+<!-- CNN -->
+<div class="section" id="cnn">
+  <div class="section-title"><span class="num">06</span> CNN — Convolutional Neural Network</div>
+  <div class="card">
+    <h3>🖼️ Why not just ANN for images?</h3>
+    <div class="code"><span class="p">Problem with ANN on images:</span>
+64×64 image = 4,096 pixels
+Each pixel → separate neuron
+4096 neurons × 4096 = 16M connections!
+Too heavy! Too slow! ❌
+
+Also ANN sees pixels as FLAT list:
+[255, 128, 64, 200, ...]
+<span class="p">No idea where things ARE! ❌</span>
+
+<span class="g">CNN Solution:</span>
+Use small filters that SLIDE over image
+Detect local patterns (edges, shapes)
+Much fewer connections! ✅</div>
+  </div>
+  <div class="card" style="--accent-line: #7209b7">
+    <h3>🔍 How CNN Filter Works</h3>
+    <div class="code"><span class="b">5×5 Image of a face:</span>
+⬛⬛⬛⬛⬛
+⬛⭕⬛⭕⬛  ← eyes
+⬛⬛⬛⬛⬛
+⬛⬜⬜⬜⬛  ← mouth
+⬛⬛⬛⬛⬛
+
+<span class="y">CNN slides a 3×3 filter window:</span>
+Step 1: top-left patch    Step 2: slide right
+⬛⬛⬛                    ⬛⬛⬛
+⬛⭕⬛  → score: 0.2      ⭕⬛⭕  → score: 0.9! 👀
+⬛⬛⬛                    ⬛⬛⬛
+
+<span class="g">High score = pattern found!</span>
+Filter learns to detect: edges, eyes, shapes...</div>
+  </div>
+  <div class="card" style="--accent-line: #4cc9f0">
+    <h3>🏗️ Full CNN Architecture</h3>
+    <div class="diagram" style="flex-direction:column;width:100%">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center">
+        <div class="box blue">🖼️ Image<br>Input</div>
+        <span class="arrow">→</span>
+        <div class="box purple">Conv Layer<br>finds edges</div>
+        <span class="arrow">→</span>
+        <div class="box pink">Pooling<br>shrinks size</div>
+        <span class="arrow">→</span>
+        <div class="box purple">Conv Layer<br>finds shapes</div>
+        <span class="arrow">→</span>
+        <div class="box pink">Pooling<br>shrinks</div>
+        <span class="arrow">→</span>
+        <div class="box green">Flatten<br>to 1D</div>
+        <span class="arrow">→</span>
+        <div class="box yellow">ANN<br>classify</div>
+        <span class="arrow">→</span>
+        <div class="box green">🐱 Cat<br>85%</div>
+      </div>
+    </div>
+    <div class="code" style="margin-top:14px"><span class="y">Pooling Example (Max Pooling):</span>
+4×4 feature map:          2×2 output:
+1  3  2  4                 6  4
+5  6  1  2   →  take max → 5  8
+3  2  1  8
+1  4  2  3
+<span class="g">Keeps most important info, reduces size! ✅</span></div>
+    <div class="interview" style="margin-top:14px">
+      <h4>💼 Interview key points:</h4>
+      <p>CNN = Feature Extractor (conv layers) + Classifier (ANN at end). Conv layers detect local patterns using sliding filters. Pooling reduces spatial dimensions. Flattening converts 2D feature maps to 1D for the final ANN. CNN understands spatial relationships that ANN cannot.</p>
+    </div>
+  </div>
+</div>
+
+<!-- RNN & LSTM -->
+<div class="section" id="rnn">
+  <div class="section-title"><span class="num">07</span> RNN & LSTM</div>
+  <div class="grid2">
+    <div class="card" style="--accent-line: #f72585">
+      <h3>📝 RNN — Short Memory</h3>
+      <div class="code"><span class="b">Sentence:</span> "I am hungry want eat"
+
+ANN/CNN (no memory):
+"eat" → forgets "hungry" ❌
+
+<span class="g">RNN (has memory):</span>
+"I"      → h1 (memory)
+"am"     → h2 (uses h1)
+"hungry" → h3 (uses h2)
+"want"   → h4 (uses h3)
+"eat"    → h5 (uses h4)
+→ remembers "hungry"! ✅
+
+<span class="p">Problem: Long sentences</span>
+<span class="p">Early words get forgotten! ❌</span>
+<span class="p">= Vanishing Gradient Problem</span></div>
+    </div>
+    <div class="card" style="--accent-line: #00f5d4">
+      <h3>💾 LSTM — Long Memory</h3>
+      <div class="code"><span class="g">3 special gates:</span>
+
+🗑️ Forget Gate:
+   What to throw away?
+   "the", "a", "is" → forget
+
+💾 Input Gate:
+   What to remember?
+   "hungry" → keep! ✅
+
+📤 Output Gate:
+   What to output now?
+   Context for current word
+
+<span class="g">Result: Remembers across</span>
+<span class="g">very long sentences! ✅</span>
+
+<span class="p">Still sequential = slow 🐢</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <table>
+      <tr><th>Model</th><th>Memory</th><th>Long Text</th><th>Speed</th><th>Use Case</th></tr>
+      <tr><td>RNN</td><td>Short ❌</td><td>Struggles ❌</td><td>Slow 🐢</td><td>Simple sequences</td></tr>
+      <tr><td>LSTM</td><td>Long ✅</td><td>Good ✅</td><td>Slow 🐢</td><td>Translation, speech</td></tr>
+      <tr><td>Transformer</td><td>Full ✅✅</td><td>Excellent ✅✅</td><td>Fast ⚡</td><td>ChatGPT, Claude</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- TRANSFORMER -->
+<div class="section" id="transformer">
+  <div class="section-title"><span class="num">08</span> Transformer — Step by Step</div>
+  <div class="card">
+    <h3>📌 Key Idea</h3>
+    <div class="code"><span class="p">LSTM problem:</span>
+"I am hungry ... [100 words] ... want to eat ___"
+Reads word by word → forgets "hungry" 🐢❌
+
+<span class="g">Transformer solution:</span>
+Reads ALL words at SAME TIME ⚡
+Every word sees every other word!
+"eat" directly sees "hungry" ✅</div>
+  </div>
+
+  <div class="tf-block">
+    <div class="tf-row" style="background:rgba(76,201,240,0.05)">
+      <div class="tf-icon">1️⃣</div>
+      <div class="tf-name">Word Embedding</div>
+      <div class="tf-desc">Convert words to vectors: "hungry" → [0.9, 0.7, 0.2]</div>
+    </div>
+    <div class="tf-row">
+      <div class="tf-icon">2️⃣</div>
+      <div class="tf-name">Positional Encoding</div>
+      <div class="tf-desc">Add position info using Sin/Cos. Same word at pos 2 ≠ pos 5</div>
+    </div>
+    <div class="tf-row" style="background:rgba(114,9,183,0.05)">
+      <div class="tf-icon">3️⃣</div>
+      <div class="tf-name">Self Attention (Q,K,V)</div>
+      <div class="tf-desc">Every word attends to every other. "eat" focuses 80% on "hungry"</div>
+    </div>
+    <div class="tf-row">
+      <div class="tf-icon">4️⃣</div>
+      <div class="tf-name">Add & Layer Norm</div>
+      <div class="tf-desc">Residual connection + normalize to keep numbers stable</div>
+    </div>
+    <div class="tf-row" style="background:rgba(0,245,212,0.05)">
+      <div class="tf-icon">5️⃣</div>
+      <div class="tf-name">Feed Forward ANN</div>
+      <div class="tf-desc">Each word thinks deeply about itself independently</div>
+    </div>
+    <div class="tf-row">
+      <div class="tf-icon">6️⃣</div>
+      <div class="tf-name">Add & Layer Norm</div>
+      <div class="tf-desc">Again stabilize numbers</div>
+    </div>
+    <div class="tf-row" style="background:rgba(247,37,133,0.05)">
+      <div class="tf-icon">🔁</div>
+      <div class="tf-name">Repeat N times</div>
+      <div class="tf-desc">GPT-3: 96 blocks. More blocks = deeper understanding</div>
+    </div>
+    <div class="tf-row">
+      <div class="tf-icon">7️⃣</div>
+      <div class="tf-name">Linear + Softmax</div>
+      <div class="tf-desc">Convert final vector to word probabilities → predict next word</div>
+    </div>
+  </div>
+
+  <div class="card" style="--accent-line: #ffd60a; margin-top:20px">
+    <h3>🎯 Self Attention Q K V — Simple Example</h3>
+    <div class="code"><span class="b">Sentence:</span> "I am hungry"
+
+<span class="y">Each word gets 3 vectors:</span>
+"hungry" → Q3 (Query:  what am I looking for?)
+         → K3 (Key:    what do I contain?)
+         → V3 (Value:  what info do I give?)
+
+<span class="y">Attention Score = Q × K:</span>
+"hungry" Q3 × K1("I")      = 0.2  → 15%
+"hungry" Q3 × K2("am")     = 0.1  → 10%
+"hungry" Q3 × K3("hungry") = 0.9  → 75% ← focus here!
+
+<span class="y">Apply Softmax → probabilities</span>
+
+<span class="y">Final = weighted sum of Values:</span>
+15% × V1 + 10% × V2 + 75% × V3
+= Rich context vector for "hungry"! <span class="g">✅</span></div>
+    <div class="interview" style="margin-top:14px">
+      <h4>💼 Interview answer for Transformer:</h4>
+      <p>Transformer (2017, "Attention is All You Need") replaced RNN/LSTM by reading all tokens simultaneously using Self-Attention. Q×K gives attention scores (how related are two words), Softmax normalizes them, then V is weighted by these scores. This runs in parallel (fast ⚡), captures long-range dependencies (no forgetting), and scales with data. Used in GPT, BERT, Claude, etc.</p>
+    </div>
+  </div>
+</div>
+
+<!-- NORMALISATION -->
+<div class="section" id="norm">
+  <div class="section-title"><span class="num">09</span> Batch Norm vs Layer Norm</div>
+  <div class="grid2">
+    <div class="card" style="--accent-line: #4cc9f0">
+      <h3>📦 Batch Normalisation</h3>
+      <div class="code"><span class="b">Normalises ACROSS sentences:</span>
+
+Sentences in batch:
+S1: "I am hungry"    → feature1: 0.9
+S2: "I love food"    → feature1: 0.3
+S3: "I want water"   → feature1: 0.6
+
+Mean = 0.6
+<span class="g">Normalize all to same range ✅</span>
+
+<span class="p">Problem: needs large batch</span>
+<span class="p">Small batch = unstable ❌</span>
+<span class="y">Used in: CNN</span></div>
+    </div>
+    <div class="card" style="--accent-line: #f72585">
+      <h3>📋 Layer Normalisation</h3>
+      <div class="code"><span class="b">Normalises WITHIN one word:</span>
+
+"hungry" vector:
+[0.7, 0.4, 0.2, 0.9]
+
+Mean = (0.7+0.4+0.2+0.9)/4 = 0.55
+<span class="g">Normalize → [0.3,-0.2,-0.5,0.5] ✅</span>
+
+Works on each word independently!
+No dependency on batch size! ✅
+Stable even with 1 sentence! ✅
+
+<span class="y">Used in: Transformer ✅</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>🔄 Residual Connection</h3>
+    <div class="code"><span class="b">Problem:</span> Deep networks lose original info!
+
+<span class="g">Solution: Add input to output!</span>
+
+Input to Self-Attention:  [0.9, 0.7, 0.2]
+Output of Self-Attention: [0.5, 0.3, 0.8]
+                           ↓ ADD TOGETHER
+Residual output:          [1.4, 1.0, 1.0]
+                           ↓ Layer Norm
+Stable vector:            [0.8, 0.5, 0.5] ✅
+
+<span class="y">Original info never lost!</span>
+<span class="y">Gradients flow better in backprop!</span></div>
+    <div class="interview" style="margin-top:14px">
+      <h4>💼 Why Layer Norm in Transformer?</h4>
+      <p>Sentences have variable lengths, making Batch Norm unstable (statistics change per batch). Layer Norm normalizes each token's vector independently — no dependency on other sentences or batch size. This makes training stable regardless of sequence length.</p>
+    </div>
+  </div>
+</div>
+
+<!-- FINAL CHEAT SHEET -->
+<div class="section">
+  <div class="section-title"><span class="num">10</span> Quick Interview Cheat Sheet</div>
+  <div class="card">
+    <table>
+      <tr><th>Model</th><th>Input</th><th>Output</th><th>Key Feature</th><th>Example</th></tr>
+      <tr><td>Linear Reg</td><td>Numbers</td><td>Number</td><td>Straight line</td><td>House price</td></tr>
+      <tr><td>Logistic Reg</td><td>Numbers</td><td>Yes/No</td><td>Sigmoid</td><td>Pass/Fail</td></tr>
+      <tr><td>ANN</td><td>Numbers</td><td>Any</td><td>Hidden layers</td><td>Salary prediction</td></tr>
+      <tr><td>CNN</td><td>Images</td><td>Class</td><td>Conv + Pooling</td><td>Cat vs Dog</td></tr>
+      <tr><td>RNN</td><td>Sequence</td><td>Sequence</td><td>Memory (short)</td><td>Text prediction</td></tr>
+      <tr><td>LSTM</td><td>Sequence</td><td>Sequence</td><td>Gates (long mem)</td><td>Translation</td></tr>
+      <tr><td>Transformer</td><td>Sequence</td><td>Sequence</td><td>Self Attention</td><td>ChatGPT, Claude</td></tr>
+    </table>
+  </div>
+  <div class="card" style="--accent-line: #ffd60a">
+    <h3>🎓 Key Concepts to Always Mention</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
+      <span class="tag g">Activation Functions</span>
+      <span class="tag b">Backpropagation</span>
+      <span class="tag p">Chain Rule</span>
+      <span class="tag y">Gradient Descent</span>
+      <span class="tag g">Vanishing Gradient</span>
+      <span class="tag b">Self Attention</span>
+      <span class="tag p">Q K V</span>
+      <span class="tag y">Positional Encoding</span>
+      <span class="tag g">Layer Normalisation</span>
+      <span class="tag b">Residual Connection</span>
+      <span class="tag p">Softmax</span>
+      <span class="tag y">Feature Maps</span>
+      <span class="tag g">Max Pooling</span>
+      <span class="tag b">LSTM Gates</span>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Built for interview prep 🎓 — From Linear Regression to Transformers
+</footer>
+
+</body>
+</html>
